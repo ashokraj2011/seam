@@ -139,8 +139,10 @@ export type Action =
 
 export type BodyRef =
   | { t: "unfilled" }
-  | { t: "actionIr"; seq: Action[] };
-// { t: "component"; hash; receipt } is reserved for MVP2.
+  | { t: "actionIr"; seq: Action[] }
+  | { t: "component"; hash: string };
+// M3 adds the receipt: { t: "component"; hash; receipt } — hosts will then
+// refuse hashes without a verification receipt.
 
 export interface Contract {
   id: ContractId;

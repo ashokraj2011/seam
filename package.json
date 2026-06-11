@@ -11,9 +11,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:component": "node scripts/build-component.mjs"
   },
   "devDependencies": {
+    "@bytecodealliance/jco": "^1.22.0",
+    "@bytecodealliance/preview2-shim": "^0.18.1",
     "@playwright/test": "^1.60.0",
     "happy-dom": "^20.10.2",
     "typescript": "^5.7.2",

@@ -15,6 +15,13 @@ export interface DispatchDeps {
   toast: (message: string, kind?: "info" | "error") => void;
   navigate: (route: string) => void;
   onPredicates?: (node: NodeId, checks: PredicateCheck[]) => void;
+  // The M2 arm: invoke a compiled component body by hash. Hosts that can't
+  // run components (e.g. minimal tests) simply omit it.
+  invokeComponent?: (
+    hash: string,
+    input: Record<string, Value>,
+    readStore: (name: string) => Row[],
+  ) => Promise<Outcome>;
 }
 
 const defaultFor = (type: TypeRef): Value =>
@@ -69,6 +76,25 @@ export function dispatchWire(
     return Array.isArray(rows) ? (rows as Row[]) : [];
   };
 
+  const applyOutcome = (outcome: Outcome): Outcome => {
+    if (outcome.result.t === "ok") {
+      try {
+        for (const write of outcome.delta) deps.state.apply(write);
+      } catch (err) {
+        deps.toast(err instanceof Error ? err.message : String(err), "error");
+        return outcome;
+      }
+      for (const trace of outcome.traces) {
+        if (trace.cap === "toast") deps.toast(trace.message);
+        else if (trace.cap === "nav") deps.navigate(trace.route);
+      }
+    } else {
+      deps.toast(outcome.result.message, "error");
+    }
+    deps.onPredicates?.(nodeId, checkPredicates(contract, input, outcome, storeNameOf, readStore));
+    return outcome;
+  };
+
   switch (contract.body.t) {
     case "unfilled":
       deps.toast(`'${contract.name}' is not filled yet`);
@@ -80,28 +106,23 @@ export function dispatchWire(
         readStore,
         now: () => Date.now(),
       });
-      if (outcome.result.t === "ok") {
-        try {
-          for (const write of outcome.delta) deps.state.apply(write);
-        } catch (err) {
-          deps.toast(err instanceof Error ? err.message : String(err), "error");
-          return outcome;
-        }
-        for (const trace of outcome.traces) {
-          if (trace.cap === "toast") deps.toast(trace.message);
-          else if (trace.cap === "nav") deps.navigate(trace.route);
-        }
-      } else {
-        deps.toast(outcome.result.message, "error");
-      }
-      deps.onPredicates?.(
-        nodeId,
-        checkPredicates(contract, input, outcome, storeNameOf, readStore),
-      );
-      return outcome;
+      return applyOutcome(outcome);
     }
-    default:
-      // BodyRef::Component — MVP2's arm.
-      throw new Error("component bodies arrive in MVP2");
+    case "component": {
+      // The shipped-path arm: instantiate by hash, imports == grants. Async
+      // (instantiation + call); the outcome lands through the same
+      // applyOutcome as the interpreter — the seam stays a seam.
+      if (!deps.invokeComponent) {
+        deps.toast("this host cannot run compiled components", "error");
+        return null;
+      }
+      void deps
+        .invokeComponent(contract.body.hash, input, readStore)
+        .then(applyOutcome)
+        .catch((err: unknown) => {
+          deps.toast(err instanceof Error ? err.message : String(err), "error");
+        });
+      return null;
+    }
   }
 }

@@ -1,0 +1,25 @@
+// app:caps — the capability standard library (BUILD_SPEC.md §5).
+// Owned by this project, versioned independently of any host. A grant in
+// the design graph becomes one of these imports; anything not granted is
+// physically absent from the component.
+package app:caps@0.1.0;
+
+interface kv-store {
+  // Records travel as field tuples in v0 — hosts map them onto their
+  // storage (IndexedDB in the browser, Postgres on the server, SQLite on
+  // desktop).
+  insert: func(store: string, fields: list<tuple<string, string>>) -> result<_, string>;
+  query: func(store: string, filter: string) -> result<list<string>, string>;
+}
+
+interface toast {
+  show: func(message: string);
+}
+
+interface clock {
+  now-ms: func() -> u64;
+}
+
+interface nav {
+  go: func(route: string);
+}

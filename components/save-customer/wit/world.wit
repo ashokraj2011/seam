@@ -1,0 +1,18 @@
+// The save-customer contract as a WIT world — the same shape the studio's
+// WIT preview projects from the graph. The granted capabilities (kv, toast)
+// are the ONLY imports: no fs, no net, because they were never granted.
+package app:customer@0.1.0;
+
+interface save-customer {
+  record save-customer-input {
+    name: string,
+    email: string,
+  }
+  invoke: func(input: save-customer-input) -> result<_, string>;
+}
+
+world save-customer-body {
+  import app:caps/kv-store@0.1.0;
+  import app:caps/toast@0.1.0;
+  export save-customer;
+}

@@ -4,11 +4,36 @@ Implementation of the contract-first application fabric studio.
 Specs: `~/Documents/artcle/BUILD_SPEC.md` (architecture) and
 `~/Documents/artcle/MVP1_PLAN_AND_SPEC.md` (MVP1 plan).
 
-**Current phase: P6 — hardening done (automatable half).** P1–P5 plus the
-quantitative gates, the Playwright run of the §9 demo script, empty states,
-first-run hints, the quickstart doc, and an IntelliJ-style dark IDE chrome.
-What remains of MVP1 is human: the cold-run demo by someone who didn't build
-the tool, and wedge validation with 5 external devs (IP review first).
+**Current phase: M2 spike — the WASM substrate works.** MVP1 (P1–P6) is
+complete, and the M2 exit criterion holds: `save-customer`, hand-written in
+Rust and compiled with cargo-component, runs in the jco browser host and is
+behaviorally identical to its action-IR twin on the drift corpus. Swapping
+`BodyRef` between IR and component in the contract editor changes nothing
+the user can observe — which is the product thesis.
+
+## What the M2 spike contains
+
+- `components/save-customer/` — the `app:caps` WIT package (kv-store, toast,
+  clock, nav) and the hand-written Rust body. Its imports are exactly the
+  contract's grants; nothing else exists at runtime.
+- `scripts/build-component.mjs` (`npm run build:component`) — the build
+  worker: cargo-component → jco transpile → hashed manifest. Runs out of
+  band; the studio never compiles during design. No thick desktop IDE
+  needed: the toolchain is a sidecar of the local dev process.
+- `src/runtime/host.ts` + `caps/` — the host import table: journaled kv and
+  toast with the same atomic semantics as the interpreter.
+- `src/runtime/component-host.ts` + `registry.ts` — invoke-by-hash (registry
+  v0; M3 adds receipts and content-addressed storage).
+- The dispatcher's third arm is live: `BodyRef::component` instantiates and
+  calls through the same `applyOutcome` seam as the interpreter.
+- `tests/drift.test.ts` — the M2 exit test: identical results, capability
+  traces, and post-state across both arms on the drift payloads. Runs on the
+  committed transpiled artifact, so CI needs no Rust toolchain.
+
+**Recorded M2 finding:** `SetState` has no capability analog — UI-state
+writes are interpreter-side only, so the Rust twin can't clear the form
+inputs. Lowering IR→Rust needs either a `ui-state` capability or wire-level
+state mapping. Decide before M5 export.
 
 ## Run
 

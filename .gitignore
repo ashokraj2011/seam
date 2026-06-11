@@ -1,7 +1,8 @@
 node_modules/
-dist/
+/dist/
 *.local
 .DS_Store
 test-results/
 playwright-report/
 .claude/
+components/save-customer/target/

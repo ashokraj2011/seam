@@ -1,7 +1,9 @@
 import { For, Show, createMemo } from "solid-js";
 import type {
   Action,
+  BodyRef,
   Contract,
+  ContractId,
   Expr,
   FieldDecl,
   FilterExpr,
@@ -11,6 +13,7 @@ import type {
   Value,
 } from "../kernel/types";
 import { actionProblems } from "../runtime/lint";
+import { componentForContract } from "../runtime/registry";
 import { contractToWit } from "../runtime/wit";
 import { newId } from "../shared/nodes";
 import {
@@ -30,6 +33,10 @@ import {
 
 const storeNameOf = (id: string): string =>
   kernel.state.stores.find((s) => s.id === id)?.name ?? id;
+
+// Session-local stash so "⇄ use action IR" can restore the body an IR↔
+// component swap replaced (undo also works — FillBody carries its inverse).
+const irStash = new Map<ContractId, BodyRef>();
 
 // ── contracts panel (left rail) ─────────────────────────────────────────────
 
@@ -110,11 +117,14 @@ export function ContractEditorOverlay() {
 
 function Editor(props: { contract: Contract }) {
   const c = () => props.contract;
+  // The kernel mutates the contract in place — JSX reading c().body alone
+  // would never re-render. Route every body read through the version signal.
+  const body = createMemo(() => (version(), c().body));
   const vars = createMemo(() => (version(), knownVars(c())));
   const problems = createMemo(() => {
     version();
-    const body = c().body;
-    return body.t === "actionIr" ? actionProblems(body.seq, c().grants, storeNameOf) : [];
+    const b = c().body;
+    return b.t === "actionIr" ? actionProblems(b.seq, c().grants, storeNameOf) : [];
   });
 
   const updateBody = (mutate: (seq: Action[]) => void) => {
@@ -242,20 +252,60 @@ function Editor(props: { contract: Contract }) {
         <section>
           <h4>
             Body{" "}
-            <Show when={c().body.t === "unfilled"}>
+            <Show when={body().t === "unfilled"}>
               <button onClick={() => updateBody(() => {})}>Fill with action IR</button>
             </Show>
+            <Show when={body().t !== "component" && componentForContract(c().name)}>
+              {(entry) => (
+                <button
+                  title="swap BodyRef to the compiled Rust component — same contract, same grants"
+                  onClick={() => {
+                    irStash.set(c().id, structuredClone(c().body));
+                    apply({ t: "FillBody", contract: c().id, body: { t: "component", hash: entry().hash } });
+                  }}
+                >
+                  ⇄ use Rust component
+                </button>
+              )}
+            </Show>
           </h4>
-          <Show
-            when={c().body.t === "actionIr"}
-            fallback={
+          <Show when={body().t === "component"}>
+            <div class="s-action">
+              <header>
+                <strong>Compiled Rust component</strong>
+                <span class="s-action__tools">
+                  <button
+                    onClick={() =>
+                      apply({
+                        t: "FillBody",
+                        contract: c().id,
+                        body: irStash.get(c().id) ?? { t: "unfilled" },
+                      })
+                    }
+                  >
+                    ⇄ use action IR
+                  </button>
+                </span>
+              </header>
+              <code class="s-dim">{(body() as { hash: string }).hash.slice(0, 26)}…</code>
               <p class="s-hint">
-                Unfilled — wiring an event to this contract shows the stub toast. Bodies that outgrow the
-                action vocabulary graduate to Rust behind the same contract (MVP2).
+                Built with cargo-component, runs in the jco host. Imports = grants — ungranted effects
+                are physically absent. Behavior verified against the drift corpus (tests/drift.test.ts).
               </p>
+            </div>
+          </Show>
+          <Show
+            when={body().t === "actionIr"}
+            fallback={
+              <Show when={body().t === "unfilled"}>
+                <p class="s-hint">
+                  Unfilled — wiring an event to this contract shows the stub toast. Bodies that outgrow
+                  the action vocabulary graduate to Rust behind the same contract.
+                </p>
+              </Show>
             }
           >
-            <For each={(c().body as { t: "actionIr"; seq: Action[] }).seq}>
+            <For each={(body() as { t: "actionIr"; seq: Action[] }).seq}>
               {(action, i) => (
                 <div class="s-action" classList={{ "s-action--bad": problems().some((p) => p.index === i()) }}>
                   <header>
@@ -268,7 +318,7 @@ function Editor(props: { contract: Contract }) {
                         ↑
                       </button>
                       <button
-                        disabled={i() === (c().body as { seq: Action[] }).seq.length - 1}
+                        disabled={i() === (body() as { seq: Action[] }).seq.length - 1}
                         onClick={() => updateBody((s) => move(s, i(), 1))}
                       >
                         ↓

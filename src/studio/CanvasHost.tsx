@@ -1,5 +1,6 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js";
 import { Renderer } from "../renderer/renderer";
+import { invokeComponent } from "../runtime/component-host";
 import type { PredicateCheck } from "../runtime/interpret";
 import { dispatchWire } from "../runtime/dispatch";
 import { collectKvTables, saveKvTables } from "../runtime/kvpersist";
@@ -112,6 +113,7 @@ export function CanvasHost() {
               else showToast(`no page at ${route}`, "error");
             },
             onPredicates: setPredicateBadges,
+            invokeComponent,
           },
           node,
           wire,

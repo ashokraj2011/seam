@@ -1,0 +1,7 @@
+{
+  "name": "save-customer",
+  "hash": "sha256:37156db205476c737829555e1221ac92deadcf55db961405973ed9294c2ec4b7",
+  "module": "/components/dist/save-customer/save_customer.js",
+  "export": "saveCustomer",
+  "builtWith": "cargo-component + jco"
+}
