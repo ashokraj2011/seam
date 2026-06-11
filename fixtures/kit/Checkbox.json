@@ -1,0 +1,21 @@
+{
+  "kind": "Checkbox",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-check__label", "equals": "Checkbox" },
+        { "is": "attr", "selector": ".k-check input", "name": "checked", "present": false }
+      ]
+    },
+    {
+      "name": "checked",
+      "props": { "label": "Active", "checked": true },
+      "expect": [
+        { "is": "text", "selector": ".k-check__label", "equals": "Active" },
+        { "is": "attr", "selector": ".k-check input", "name": "checked", "present": true }
+      ]
+    }
+  ]
+}

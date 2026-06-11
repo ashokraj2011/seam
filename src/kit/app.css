@@ -1,0 +1,213 @@
+/* Seam Studio kit — one stylesheet for studio preview and shipped apps.
+   Three layers: default tokens (generated from DEFAULT_THEME), hand-written
+   kit styles, and the generated utility-class layer (from styleprops.ts).
+   Generated blocks are drift-tested; regenerate with:
+   UPDATE_CSS=1 npx vitest run tests/appcss.test.ts */
+
+/* @generated tokens:start */
+:root {
+  --color-bg: #ffffff;
+  --color-danger: #e5484d;
+  --color-muted: #6b7280;
+  --color-primary: #4f63f5;
+  --color-surface: #f4f5f7;
+  --color-text: #1c2024;
+  --radius-md: 6px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+}
+/* @generated tokens:end */
+
+/* ── kit styles ─────────────────────────────────────────────────────────── */
+
+/* Kit display rules (e.g. .k-modal { display: flex }) would otherwise beat
+   the UA's [hidden] { display: none } — hidden must always win. */
+[hidden] {
+  display: none !important;
+}
+
+.k-label {
+  color: var(--color-text);
+}
+
+.k-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.k-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.k-btn--primary {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+.k-btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-muted);
+}
+.k-btn--danger {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+
+.k-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.k-field__label {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.k-input,
+.k-select,
+.k-textarea {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 8px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-muted);
+  border-radius: var(--radius-md);
+}
+
+.k-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
+
+.k-container {
+  min-width: 0;
+}
+
+.k-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+  padding: var(--space-3);
+}
+.k-card__title {
+  margin: 0 0 var(--space-2);
+  font-size: 14px;
+  color: var(--color-text);
+}
+.k-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.k-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.k-table__table th,
+.k-table__table td {
+  text-align: left;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-surface);
+  color: var(--color-text);
+}
+.k-table__table th {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.k-table__table tbody tr:hover {
+  background: var(--color-surface);
+  cursor: pointer;
+}
+.k-table__notice {
+  padding: var(--space-1) var(--space-2);
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.k-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.k-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 40%);
+}
+.k-modal__panel {
+  position: relative;
+  min-width: 280px;
+  max-width: 90vw;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 25%);
+}
+.k-modal__title {
+  margin: 0 0 var(--space-2);
+  font-size: 14px;
+  color: var(--color-text);
+}
+.k-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.k-toast {
+  position: fixed;
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+
+/* ── generated utilities ────────────────────────────────────────────────── */
+
+/* @generated utilities:start */
+.u-hidden { display: none !important; }
+.u-flex-row { display: flex; flex-direction: row; }
+.u-flex-column { display: flex; flex-direction: column; }
+.u-wrap { flex-wrap: wrap; }
+.u-grid { display: grid; }
+.u-gap-0 { gap: 0; }
+.u-gap-1 { gap: var(--space-1); }
+.u-gap-2 { gap: var(--space-2); }
+.u-gap-3 { gap: var(--space-3); }
+.u-pad-0 { padding: 0; }
+.u-pad-1 { padding: var(--space-1); }
+.u-pad-2 { padding: var(--space-2); }
+.u-pad-3 { padding: var(--space-3); }
+.u-bg-none { background: transparent; }
+.u-bg-surface { background: var(--color-surface); }
+.u-bg-primary { background: var(--color-primary); color: #ffffff; }
+.u-bg-danger { background: var(--color-danger); color: #ffffff; }
+.u-fg-text { color: var(--color-text); }
+.u-fg-muted { color: var(--color-muted); }
+.u-fg-primary { color: var(--color-primary); }
+.u-fg-danger { color: var(--color-danger); }
+.u-radius-none { border-radius: 0; }
+.u-radius-md { border-radius: var(--radius-md); }
+.u-size-auto { width: auto; }
+.u-size-fill { width: 100%; }
+.u-align-start { align-self: flex-start; }
+.u-align-center { align-self: center; }
+.u-align-end { align-self: flex-end; }
+.u-align-stretch { align-self: stretch; }
+/* @generated utilities:end */

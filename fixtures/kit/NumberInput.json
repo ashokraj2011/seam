@@ -1,0 +1,21 @@
+{
+  "kind": "NumberInput",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Label" },
+        { "is": "attr", "selector": ".k-input", "name": "value", "equals": "0" }
+      ]
+    },
+    {
+      "name": "filled",
+      "props": { "label": "Age", "value": 42 },
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Age" },
+        { "is": "attr", "selector": ".k-input", "name": "value", "equals": "42" }
+      ]
+    }
+  ]
+}

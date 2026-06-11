@@ -1,0 +1,21 @@
+{
+  "kind": "Card",
+  "cases": [
+    {
+      "name": "default untitled",
+      "props": {},
+      "expect": [
+        { "is": "attr", "selector": ".k-card__title", "name": "hidden", "present": true },
+        { "is": "count", "selector": ".k-card__body", "equals": 1 }
+      ]
+    },
+    {
+      "name": "titled",
+      "props": { "title": "Customers" },
+      "expect": [
+        { "is": "text", "selector": ".k-card__title", "equals": "Customers" },
+        { "is": "attr", "selector": ".k-card__title", "name": "hidden", "present": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "kind": "Table",
+  "cases": [
+    {
+      "name": "default empty",
+      "props": {},
+      "expect": [
+        { "is": "count", "selector": "thead th", "equals": 1 },
+        { "is": "text", "selector": "thead th", "equals": "Column 1" },
+        { "is": "count", "selector": "tbody tr", "equals": 0 },
+        { "is": "attr", "selector": ".k-table__notice", "name": "hidden", "present": true }
+      ]
+    },
+    {
+      "name": "two columns two rows",
+      "props": {
+        "columns": ["name", "email"],
+        "rows": [
+          { "name": "Ada", "email": "ada@example.com" },
+          { "name": "Grace", "email": "grace@example.com" }
+        ]
+      },
+      "expect": [
+        { "is": "count", "selector": "thead th", "equals": 2 },
+        { "is": "count", "selector": "tbody tr", "equals": 2 },
+        { "is": "text", "selector": "tbody tr td", "equals": "Ada" },
+        { "is": "attr", "selector": ".k-table__notice", "name": "hidden", "present": true }
+      ]
+    }
+  ]
+}

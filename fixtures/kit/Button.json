@@ -1,0 +1,30 @@
+{
+  "kind": "Button",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-btn__label", "equals": "Button" },
+        { "is": "class", "selector": ".k-btn", "has": ["k-btn--primary"] },
+        { "is": "attr", "selector": ".k-btn", "name": "disabled", "present": false }
+      ]
+    },
+    {
+      "name": "danger disabled with custom text",
+      "props": { "text": "Delete", "variant": "danger", "disabled": true },
+      "expect": [
+        { "is": "text", "selector": ".k-btn__label", "equals": "Delete" },
+        { "is": "class", "selector": ".k-btn", "has": ["k-btn--danger"], "lacks": ["k-btn--primary"] },
+        { "is": "attr", "selector": ".k-btn", "name": "disabled", "present": true }
+      ]
+    },
+    {
+      "name": "secondary",
+      "props": { "variant": "secondary" },
+      "expect": [
+        { "is": "class", "selector": ".k-btn", "has": ["k-btn--secondary"], "lacks": ["k-btn--primary", "k-btn--danger"] }
+      ]
+    }
+  ]
+}

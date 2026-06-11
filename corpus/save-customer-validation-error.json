@@ -1,0 +1,29 @@
+{
+  "name": "save-customer: validation error rolls back everything",
+  "stores": [
+    {
+      "id": "s1",
+      "name": "customers",
+      "rows": [{ "name": "Ada Lovelace", "email": "ada@example.com" }]
+    }
+  ],
+  "state": { "state.draftName": "", "state.draftEmail": "" },
+  "input": { "name": "", "email": "nobody@example.com" },
+  "body": [
+    { "t": "Validate", "var": "name", "rule": { "t": "nonEmpty" }, "elseError": "name is required" },
+    {
+      "t": "KvInsert",
+      "store": "s1",
+      "record": { "name": { "t": "var", "name": "name" }, "email": { "t": "var", "name": "email" } }
+    },
+    { "t": "Toast", "template": "Saved {name}" }
+  ],
+  "expect": {
+    "result": { "t": "error", "message": "name is required" },
+    "traces": [],
+    "storesAfter": {
+      "customers": [{ "name": "Ada Lovelace", "email": "ada@example.com" }]
+    },
+    "stateAfter": { "state.draftName": "", "state.draftEmail": "" }
+  }
+}

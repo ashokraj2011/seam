@@ -1,0 +1,42 @@
+{
+  "name": "query + branch: duplicate guard via empty(found)",
+  "stores": [
+    {
+      "id": "s1",
+      "name": "customers",
+      "rows": [{ "name": "Ada Lovelace", "email": "ada@example.com" }]
+    }
+  ],
+  "state": {},
+  "input": { "name": "Ada Lovelace", "email": "other@example.com" },
+  "body": [
+    {
+      "t": "KvQuery",
+      "store": "s1",
+      "filter": { "field": "name", "op": "eq", "value": { "t": "var", "name": "name" } },
+      "into": "found"
+    },
+    {
+      "t": "Branch",
+      "cond": { "t": "empty", "var": "found" },
+      "then": [
+        {
+          "t": "KvInsert",
+          "store": "s1",
+          "record": { "name": { "t": "var", "name": "name" }, "email": { "t": "var", "name": "email" } }
+        }
+      ],
+      "else": [
+        { "t": "Validate", "var": "found", "rule": { "t": "range", "max": 0 }, "elseError": "already exists" }
+      ]
+    }
+  ],
+  "expect": {
+    "result": { "t": "error", "message": "already exists" },
+    "traces": [{ "cap": "kv", "op": "query", "store": "customers" }],
+    "storesAfter": {
+      "customers": [{ "name": "Ada Lovelace", "email": "ada@example.com" }]
+    },
+    "stateAfter": {}
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "save-customer: happy path",
+  "stores": [
+    {
+      "id": "s1",
+      "name": "customers",
+      "rows": [{ "name": "Ada Lovelace", "email": "ada@example.com" }]
+    }
+  ],
+  "state": { "state.draftName": "Edsger Dijkstra", "state.draftEmail": "edsger@example.com" },
+  "input": { "name": "Edsger Dijkstra", "email": "edsger@example.com" },
+  "body": [
+    { "t": "Validate", "var": "name", "rule": { "t": "nonEmpty" }, "elseError": "name is required" },
+    {
+      "t": "KvInsert",
+      "store": "s1",
+      "record": { "name": { "t": "var", "name": "name" }, "email": { "t": "var", "name": "email" } }
+    },
+    { "t": "Toast", "template": "Saved {name}" },
+    { "t": "SetState", "path": "state.draftName", "from": { "t": "lit", "value": "" } },
+    { "t": "SetState", "path": "state.draftEmail", "from": { "t": "lit", "value": "" } }
+  ],
+  "expect": {
+    "result": { "t": "ok" },
+    "traces": [
+      { "cap": "kv", "op": "insert", "store": "customers" },
+      { "cap": "toast", "message": "Saved Edsger Dijkstra" }
+    ],
+    "storesAfter": {
+      "customers": [
+        { "name": "Ada Lovelace", "email": "ada@example.com" },
+        { "name": "Edsger Dijkstra", "email": "edsger@example.com" }
+      ]
+    },
+    "stateAfter": { "state.draftName": "", "state.draftEmail": "" }
+  }
+}

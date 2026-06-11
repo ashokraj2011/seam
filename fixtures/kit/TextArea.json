@@ -1,0 +1,23 @@
+{
+  "kind": "TextArea",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Label" },
+        { "is": "attr", "selector": ".k-textarea", "name": "rows", "equals": "3" }
+      ]
+    },
+    {
+      "name": "filled",
+      "props": { "label": "Notes", "placeholder": "Say more", "value": "hi", "rows": 5 },
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Notes" },
+        { "is": "text", "selector": ".k-textarea", "equals": "hi" },
+        { "is": "attr", "selector": ".k-textarea", "name": "rows", "equals": "5" },
+        { "is": "attr", "selector": ".k-textarea", "name": "placeholder", "equals": "Say more" }
+      ]
+    }
+  ]
+}

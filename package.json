@@ -1,0 +1,27 @@
+{
+  "name": "seam-studio",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Contract-first application fabric studio — MVP1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "happy-dom": "^20.10.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.5",
+    "vite-plugin-solid": "^2.11.12",
+    "vitest": "^3.1.4"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.13"
+  }
+}

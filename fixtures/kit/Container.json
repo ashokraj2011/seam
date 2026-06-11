@@ -1,0 +1,26 @@
+{
+  "kind": "Container",
+  "cases": [
+    {
+      "name": "default column",
+      "props": {},
+      "expect": [
+        { "is": "class", "selector": ".k-container", "has": ["u-flex-column", "u-gap-2"], "lacks": ["u-grid", "u-wrap"] }
+      ]
+    },
+    {
+      "name": "wrapping row with no gap",
+      "props": { "direction": "row", "gap": "0", "wrap": true },
+      "expect": [
+        { "is": "class", "selector": ".k-container", "has": ["u-flex-row", "u-gap-0", "u-wrap"], "lacks": ["u-flex-column"] }
+      ]
+    },
+    {
+      "name": "two-column grid",
+      "props": { "columns": 2 },
+      "expect": [
+        { "is": "class", "selector": ".k-container", "has": ["u-grid", "u-gap-2"], "lacks": ["u-flex-column", "u-flex-row"] }
+      ]
+    }
+  ]
+}

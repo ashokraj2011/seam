@@ -1,0 +1,35 @@
+{
+  "name": "delete-customer: row removed, modal closed",
+  "stores": [
+    {
+      "id": "s1",
+      "name": "customers",
+      "rows": [
+        { "name": "Ada Lovelace", "email": "ada@example.com" },
+        { "name": "Grace Hopper", "email": "grace@example.com" }
+      ]
+    }
+  ],
+  "state": { "state.pendingName": "Ada Lovelace", "state.confirmOpen": true },
+  "input": { "name": "Ada Lovelace" },
+  "body": [
+    {
+      "t": "KvDelete",
+      "store": "s1",
+      "where": { "field": "name", "op": "eq", "value": { "t": "var", "name": "name" } }
+    },
+    { "t": "SetState", "path": "state.confirmOpen", "from": { "t": "lit", "value": false } },
+    { "t": "Toast", "template": "Deleted {name}" }
+  ],
+  "expect": {
+    "result": { "t": "ok" },
+    "traces": [
+      { "cap": "kv", "op": "delete", "store": "customers" },
+      { "cap": "toast", "message": "Deleted Ada Lovelace" }
+    ],
+    "storesAfter": {
+      "customers": [{ "name": "Grace Hopper", "email": "grace@example.com" }]
+    },
+    "stateAfter": { "state.confirmOpen": false }
+  }
+}

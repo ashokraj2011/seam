@@ -1,0 +1,15 @@
+{
+  "kind": "Label",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [{ "is": "text", "selector": ".k-label", "equals": "Label" }]
+    },
+    {
+      "name": "custom text",
+      "props": { "text": "Hello" },
+      "expect": [{ "is": "text", "selector": ".k-label", "equals": "Hello" }]
+    }
+  ]
+}

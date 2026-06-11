@@ -1,0 +1,22 @@
+{
+  "kind": "Modal",
+  "cases": [
+    {
+      "name": "default closed",
+      "props": {},
+      "expect": [
+        { "is": "attr", "selector": ".k-modal", "name": "hidden", "present": true },
+        { "is": "text", "selector": ".k-modal__title", "equals": "Modal" }
+      ]
+    },
+    {
+      "name": "open with title",
+      "props": { "open": true, "title": "Confirm delete" },
+      "expect": [
+        { "is": "attr", "selector": ".k-modal", "name": "hidden", "present": false },
+        { "is": "text", "selector": ".k-modal__title", "equals": "Confirm delete" },
+        { "is": "count", "selector": ".k-modal__body", "equals": 1 }
+      ]
+    }
+  ]
+}

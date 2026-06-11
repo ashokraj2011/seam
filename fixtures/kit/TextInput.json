@@ -1,0 +1,23 @@
+{
+  "kind": "TextInput",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Label" },
+        { "is": "attr", "selector": ".k-input", "name": "value", "equals": "" },
+        { "is": "attr", "selector": ".k-input", "name": "placeholder", "present": false }
+      ]
+    },
+    {
+      "name": "filled",
+      "props": { "label": "Name", "placeholder": "Jane Doe", "value": "Ada" },
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Name" },
+        { "is": "attr", "selector": ".k-input", "name": "placeholder", "equals": "Jane Doe" },
+        { "is": "attr", "selector": ".k-input", "name": "value", "equals": "Ada" }
+      ]
+    }
+  ]
+}

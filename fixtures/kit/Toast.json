@@ -1,0 +1,18 @@
+{
+  "kind": "Toast",
+  "cases": [
+    {
+      "name": "default hidden",
+      "props": {},
+      "expect": [{ "is": "attr", "selector": ".k-toast", "name": "hidden", "present": true }]
+    },
+    {
+      "name": "open with text",
+      "props": { "open": true, "text": "Saved!", "duration": 5000 },
+      "expect": [
+        { "is": "attr", "selector": ".k-toast", "name": "hidden", "present": false },
+        { "is": "text", "selector": ".k-toast__text", "equals": "Saved!" }
+      ]
+    }
+  ]
+}

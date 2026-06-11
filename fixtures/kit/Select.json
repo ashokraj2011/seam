@@ -1,0 +1,23 @@
+{
+  "kind": "Select",
+  "cases": [
+    {
+      "name": "default",
+      "props": {},
+      "expect": [
+        { "is": "text", "selector": ".k-field__label", "equals": "Select" },
+        { "is": "count", "selector": ".k-select option", "equals": 2 },
+        { "is": "text", "selector": ".k-select option", "equals": "Option 1" }
+      ]
+    },
+    {
+      "name": "custom options with selection",
+      "props": { "label": "Variant", "options": ["a", "b", "c"], "value": "b" },
+      "expect": [
+        { "is": "count", "selector": ".k-select option", "equals": 3 },
+        { "is": "attr", "selector": ".k-select option[value=\"b\"]", "name": "selected", "present": true },
+        { "is": "attr", "selector": ".k-select option[value=\"a\"]", "name": "selected", "present": false }
+      ]
+    }
+  ]
+}
