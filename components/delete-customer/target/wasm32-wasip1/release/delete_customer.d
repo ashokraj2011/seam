@@ -1,0 +1,1 @@
+/Users/ashokraj/Documents/seamStudio/components/delete-customer/target/wasm32-wasip1/release/delete_customer.wasm: /Users/ashokraj/Documents/seamStudio/components/delete-customer/src/bindings.rs /Users/ashokraj/Documents/seamStudio/components/delete-customer/src/lib.rs

@@ -1,0 +1,13 @@
+package app:customer@0.1.0;
+
+interface delete-customer {
+  record delete-customer-input { name: string }
+  invoke: func(input: delete-customer-input) -> result<_, string>;
+}
+
+world delete-customer-body {
+  import app:caps/kv-store@0.1.0;
+  import app:caps/ui-state@0.1.0;
+  import app:caps/toast@0.1.0;
+  export delete-customer;
+}

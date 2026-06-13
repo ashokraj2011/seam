@@ -9,6 +9,7 @@ import type {
   Value,
 } from "../kernel/types";
 import type { StateWrite } from "./state";
+import { rowMatches } from "./filter";
 
 // The action-IR interpreter (MVP1_PLAN_AND_SPEC.md §7). A body executes
 // atomically against capability fakes: kv reads/writes go to a lazily-cloned
@@ -79,18 +80,10 @@ export function interpret(seq: Action[], ctx: InterpretCtx): Outcome {
   const evalExpr = (e: Expr): Value => (e.t === "lit" ? e.value : (evalVar(e.name) ?? null));
   const template = (tpl: string): string =>
     tpl.replace(/\{([\w.]+)\}/g, (_, name: string) => String(evalVar(name) ?? ""));
-  const matches = (row: Row, f: FilterExpr): boolean => {
-    const left = row[f.field];
-    const right = evalExpr(f.value);
-    switch (f.op) {
-      case "eq":
-        return left === right;
-      case "neq":
-        return left !== right;
-      case "contains":
-        return typeof left === "string" && typeof right === "string" && left.includes(right);
-    }
-  };
+  // Resolve a filter's value against current vars, then compare via the
+  // shared rowMatches — the same function the component host uses.
+  const matches = (row: Row, f: FilterExpr): boolean =>
+    rowMatches(row[f.field], f.op, evalExpr(f.value));
 
   const run = (actions: Action[]): string | null => {
     for (const action of actions) {
@@ -127,16 +120,19 @@ export function interpret(seq: Action[], ctx: InterpretCtx): Outcome {
         }
         case "KvDelete": {
           const name = ctx.storeNameOf(action.store);
-          const where = structuredClone(action.where);
-          const snapshot = { ...vars }; // pred evaluates against vars at this point
+          // Resolve the filter value ONCE, against vars at this point, so the
+          // predicate is stable (and matches what the lowered Rust sends).
+          const field = action.where.field;
+          const op = action.where.op;
+          const value = evalExpr(action.where.value);
           overlay.set(
             name,
-            rowsOf(name).filter((row) => !matchesWith(row, where, snapshot)),
+            rowsOf(name).filter((row) => !rowMatches(row[field], op, value)),
           );
           delta.push({
             t: "removeWhere",
             path: `store.${name}`,
-            pred: (item) => matchesWith(item as Row, where, snapshot),
+            pred: (item) => rowMatches((item as Row)[field], op, value),
           });
           traces.push({ cap: "kv", op: "delete", store: name });
           break;
@@ -173,35 +169,9 @@ export function interpret(seq: Action[], ctx: InterpretCtx): Outcome {
     return false;
   };
 
-  const matchesWith = (row: Row, f: FilterExpr, snapshot: Record<string, Value>): boolean => {
-    const left = row[f.field];
-    const right =
-      f.value.t === "lit"
-        ? f.value.value
-        : (resolveDotPath(snapshot, f.value.name) ?? null);
-    switch (f.op) {
-      case "eq":
-        return left === right;
-      case "neq":
-        return left !== right;
-      case "contains":
-        return typeof left === "string" && typeof right === "string" && left.includes(right);
-    }
-  };
-
   const error = run(seq);
   if (error !== null) return { result: { t: "error", message: error }, delta: [], traces };
   return { result: { t: "ok" }, delta, traces };
-}
-
-function resolveDotPath(vars: Record<string, Value>, name: string): Value | undefined {
-  const [head, ...rest] = name.split(".");
-  let v: Value | undefined = vars[head!];
-  for (const seg of rest) {
-    if (v && typeof v === "object" && !Array.isArray(v)) v = (v as Record<string, Value>)[seg];
-    else return undefined;
-  }
-  return v;
 }
 
 // ── predicates: trace assertions after every Run-mode invocation ───────────

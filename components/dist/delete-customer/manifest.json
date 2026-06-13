@@ -1,0 +1,7 @@
+{
+  "name": "delete-customer",
+  "hash": "sha256:756db98bbebee6f1c4ec2a698670ffae607878e3fdff8a0a594aad43225b6b6e",
+  "module": "/components/dist/delete-customer/delete_customer.js",
+  "export": "deleteCustomer",
+  "builtWith": "lower.ts -> cargo-component -> jco"
+}

@@ -12,7 +12,6 @@ crate-type = ["cdylib"]
 [profile.release]
 codegen-units = 1
 opt-level = "s"
-debug = false
 strip = true
 lto = true
 

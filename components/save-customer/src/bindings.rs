@@ -12,9 +12,11 @@ pub mod app {
             static __FORCE_SECTION_REF: fn() = super::super::super::__link_custom_section_describing_imports;
             use super::super::super::_rt;
             #[allow(unused_unsafe, clippy::all)]
-            /// Records travel as field tuples in v0 — hosts map them onto their
-            /// storage (IndexedDB in the browser, Postgres on the server, SQLite on
-            /// desktop).
+            /// Records travel as field tuples in v0; hosts map them onto their storage
+            /// (IndexedDB in the browser, Postgres on the server, SQLite on desktop).
+            /// Filters are (field, op, value): op is "eq" | "neq" | "contains" and value
+            /// is JSON-encoded, so the host reconstructs the exact Value and evaluates it
+            /// with the same matcher the interpreter uses.
             pub fn insert(
                 store: &str,
                 fields: &[(_rt::String, _rt::String)],
@@ -131,7 +133,9 @@ pub mod app {
             #[allow(unused_unsafe, clippy::all)]
             pub fn query(
                 store: &str,
-                filter: &str,
+                field: &str,
+                op: &str,
+                value: &str,
             ) -> Result<_rt::Vec<_rt::String>, _rt::String> {
                 unsafe {
                     #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
@@ -148,15 +152,25 @@ pub mod app {
                     let vec0 = store;
                     let ptr0 = vec0.as_ptr().cast::<u8>();
                     let len0 = vec0.len();
-                    let vec1 = filter;
+                    let vec1 = field;
                     let ptr1 = vec1.as_ptr().cast::<u8>();
                     let len1 = vec1.len();
-                    let ptr2 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    let vec2 = op;
+                    let ptr2 = vec2.as_ptr().cast::<u8>();
+                    let len2 = vec2.len();
+                    let vec3 = value;
+                    let ptr3 = vec3.as_ptr().cast::<u8>();
+                    let len3 = vec3.len();
+                    let ptr4 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
                     #[link(wasm_import_module = "app:caps/kv-store@0.1.0")]
                     unsafe extern "C" {
                         #[link_name = "query"]
-                        fn wit_import3(
+                        fn wit_import5(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
                             _: *mut u8,
                             _: usize,
                             _: *mut u8,
@@ -165,7 +179,11 @@ pub mod app {
                         );
                     }
                     #[cfg(not(target_arch = "wasm32"))]
-                    unsafe extern "C" fn wit_import3(
+                    unsafe extern "C" fn wit_import5(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
                         _: *mut u8,
                         _: usize,
                         _: *mut u8,
@@ -175,54 +193,213 @@ pub mod app {
                         unreachable!()
                     }
                     unsafe {
-                        wit_import3(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1, ptr2)
+                        wit_import5(
+                            ptr0.cast_mut(),
+                            len0,
+                            ptr1.cast_mut(),
+                            len1,
+                            ptr2.cast_mut(),
+                            len2,
+                            ptr3.cast_mut(),
+                            len3,
+                            ptr4,
+                        )
                     };
-                    let l4 = i32::from(*ptr2.add(0).cast::<u8>());
-                    let result14 = match l4 {
+                    let l6 = i32::from(*ptr4.add(0).cast::<u8>());
+                    let result16 = match l6 {
                         0 => {
                             let e = {
-                                let l5 = *ptr2
+                                let l7 = *ptr4
                                     .add(::core::mem::size_of::<*const u8>())
                                     .cast::<*mut u8>();
-                                let l6 = *ptr2
+                                let l8 = *ptr4
                                     .add(2 * ::core::mem::size_of::<*const u8>())
                                     .cast::<usize>();
-                                let base10 = l5;
-                                let len10 = l6;
-                                let mut result10 = _rt::Vec::with_capacity(len10);
-                                for i in 0..len10 {
-                                    let base = base10
+                                let base12 = l7;
+                                let len12 = l8;
+                                let mut result12 = _rt::Vec::with_capacity(len12);
+                                for i in 0..len12 {
+                                    let base = base12
                                         .add(i * (2 * ::core::mem::size_of::<*const u8>()));
-                                    let e10 = {
-                                        let l7 = *base.add(0).cast::<*mut u8>();
-                                        let l8 = *base
+                                    let e12 = {
+                                        let l9 = *base.add(0).cast::<*mut u8>();
+                                        let l10 = *base
                                             .add(::core::mem::size_of::<*const u8>())
                                             .cast::<usize>();
-                                        let len9 = l8;
-                                        let bytes9 = _rt::Vec::from_raw_parts(
-                                            l7.cast(),
-                                            len9,
-                                            len9,
+                                        let len11 = l10;
+                                        let bytes11 = _rt::Vec::from_raw_parts(
+                                            l9.cast(),
+                                            len11,
+                                            len11,
                                         );
-                                        _rt::string_lift(bytes9)
+                                        _rt::string_lift(bytes11)
                                     };
-                                    result10.push(e10);
+                                    result12.push(e12);
                                 }
                                 _rt::cabi_dealloc(
-                                    base10,
-                                    len10 * (2 * ::core::mem::size_of::<*const u8>()),
+                                    base12,
+                                    len12 * (2 * ::core::mem::size_of::<*const u8>()),
                                     ::core::mem::size_of::<*const u8>(),
                                 );
-                                result10
+                                result12
                             };
                             Ok(e)
                         }
                         1 => {
                             let e = {
-                                let l11 = *ptr2
+                                let l13 = *ptr4
                                     .add(::core::mem::size_of::<*const u8>())
                                     .cast::<*mut u8>();
-                                let l12 = *ptr2
+                                let l14 = *ptr4
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len15 = l14;
+                                let bytes15 = _rt::Vec::from_raw_parts(
+                                    l13.cast(),
+                                    len15,
+                                    len15,
+                                );
+                                _rt::string_lift(bytes15)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result16
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn update(
+                store: &str,
+                field: &str,
+                op: &str,
+                value: &str,
+                fields: &[(_rt::String, _rt::String)],
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = store;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = field;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let vec2 = op;
+                    let ptr2 = vec2.as_ptr().cast::<u8>();
+                    let len2 = vec2.len();
+                    let vec3 = value;
+                    let ptr3 = vec3.as_ptr().cast::<u8>();
+                    let len3 = vec3.len();
+                    let vec7 = fields;
+                    let len7 = vec7.len();
+                    let layout7 = _rt::alloc::Layout::from_size_align_unchecked(
+                        vec7.len() * (4 * ::core::mem::size_of::<*const u8>()),
+                        ::core::mem::size_of::<*const u8>(),
+                    );
+                    let result7 = if layout7.size() != 0 {
+                        let ptr = _rt::alloc::alloc(layout7).cast::<u8>();
+                        if ptr.is_null() {
+                            _rt::alloc::handle_alloc_error(layout7);
+                        }
+                        ptr
+                    } else {
+                        ::core::ptr::null_mut()
+                    };
+                    for (i, e) in vec7.into_iter().enumerate() {
+                        let base = result7
+                            .add(i * (4 * ::core::mem::size_of::<*const u8>()));
+                        {
+                            let (t4_0, t4_1) = e;
+                            let vec5 = t4_0;
+                            let ptr5 = vec5.as_ptr().cast::<u8>();
+                            let len5 = vec5.len();
+                            *base
+                                .add(::core::mem::size_of::<*const u8>())
+                                .cast::<usize>() = len5;
+                            *base.add(0).cast::<*mut u8>() = ptr5.cast_mut();
+                            let vec6 = t4_1;
+                            let ptr6 = vec6.as_ptr().cast::<u8>();
+                            let len6 = vec6.len();
+                            *base
+                                .add(3 * ::core::mem::size_of::<*const u8>())
+                                .cast::<usize>() = len6;
+                            *base
+                                .add(2 * ::core::mem::size_of::<*const u8>())
+                                .cast::<*mut u8>() = ptr6.cast_mut();
+                        }
+                    }
+                    let ptr8 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "app:caps/kv-store@0.1.0")]
+                    unsafe extern "C" {
+                        #[link_name = "update"]
+                        fn wit_import9(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import9(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import9(
+                            ptr0.cast_mut(),
+                            len0,
+                            ptr1.cast_mut(),
+                            len1,
+                            ptr2.cast_mut(),
+                            len2,
+                            ptr3.cast_mut(),
+                            len3,
+                            result7,
+                            len7,
+                            ptr8,
+                        )
+                    };
+                    let l10 = i32::from(*ptr8.add(0).cast::<u8>());
+                    let result14 = match l10 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l11 = *ptr8
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l12 = *ptr8
                                     .add(2 * ::core::mem::size_of::<*const u8>())
                                     .cast::<usize>();
                                 let len13 = l12;
@@ -237,7 +414,114 @@ pub mod app {
                         }
                         _ => _rt::invalid_enum_discriminant(),
                     };
+                    if layout7.size() != 0 {
+                        _rt::alloc::dealloc(result7.cast(), layout7);
+                    }
                     result14
+                }
+            }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn delete(
+                store: &str,
+                field: &str,
+                op: &str,
+                value: &str,
+            ) -> Result<(), _rt::String> {
+                unsafe {
+                    #[cfg_attr(target_pointer_width = "64", repr(align(8)))]
+                    #[cfg_attr(target_pointer_width = "32", repr(align(4)))]
+                    struct RetArea(
+                        [::core::mem::MaybeUninit<
+                            u8,
+                        >; 3 * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let mut ret_area = RetArea(
+                        [::core::mem::MaybeUninit::uninit(); 3
+                            * ::core::mem::size_of::<*const u8>()],
+                    );
+                    let vec0 = store;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = field;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    let vec2 = op;
+                    let ptr2 = vec2.as_ptr().cast::<u8>();
+                    let len2 = vec2.len();
+                    let vec3 = value;
+                    let ptr3 = vec3.as_ptr().cast::<u8>();
+                    let len3 = vec3.len();
+                    let ptr4 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "app:caps/kv-store@0.1.0")]
+                    unsafe extern "C" {
+                        #[link_name = "delete"]
+                        fn wit_import5(
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                            _: usize,
+                            _: *mut u8,
+                        );
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import5(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe {
+                        wit_import5(
+                            ptr0.cast_mut(),
+                            len0,
+                            ptr1.cast_mut(),
+                            len1,
+                            ptr2.cast_mut(),
+                            len2,
+                            ptr3.cast_mut(),
+                            len3,
+                            ptr4,
+                        )
+                    };
+                    let l6 = i32::from(*ptr4.add(0).cast::<u8>());
+                    let result10 = match l6 {
+                        0 => {
+                            let e = ();
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l7 = *ptr4
+                                    .add(::core::mem::size_of::<*const u8>())
+                                    .cast::<*mut u8>();
+                                let l8 = *ptr4
+                                    .add(2 * ::core::mem::size_of::<*const u8>())
+                                    .cast::<usize>();
+                                let len9 = l8;
+                                let bytes9 = _rt::Vec::from_raw_parts(
+                                    l7.cast(),
+                                    len9,
+                                    len9,
+                                );
+                                _rt::string_lift(bytes9)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    };
+                    result10
                 }
             }
         }
@@ -490,19 +774,21 @@ pub(crate) use __export_save_customer_body_impl as export;
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 516] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xfb\x02\x01A\x02\x01\
-A\x08\x01B\x09\x01o\x02ss\x01p\0\x01j\0\x01s\x01@\x02\x05stores\x06fields\x01\0\x02\
-\x04\0\x06insert\x01\x03\x01ps\x01j\x01\x04\x01s\x01@\x02\x05stores\x06filters\0\
-\x05\x04\0\x05query\x01\x06\x03\0\x17app:caps/kv-store@0.1.0\x05\0\x01B\x02\x01@\
-\x01\x07messages\x01\0\x04\0\x04show\x01\0\x03\0\x14app:caps/toast@0.1.0\x05\x01\
-\x01B\x02\x01@\x02\x04paths\x05values\x01\0\x04\0\x03set\x01\0\x03\0\x17app:caps\
-/ui-state@0.1.0\x05\x02\x01B\x05\x01r\x02\x04names\x05emails\x04\0\x13save-custo\
-mer-input\x03\0\0\x01j\0\x01s\x01@\x01\x05input\x01\0\x02\x04\0\x06invoke\x01\x03\
-\x04\0\x20app:customer/save-customer@0.1.0\x05\x03\x04\0%app:customer/save-custo\
-mer-body@0.1.0\x04\0\x0b\x18\x01\0\x12save-customer-body\x03\0\0\0G\x09producers\
-\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41\
-.0";
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 616] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xdf\x03\x01A\x02\x01\
+A\x08\x01B\x0d\x01o\x02ss\x01p\0\x01j\0\x01s\x01@\x02\x05stores\x06fields\x01\0\x02\
+\x04\0\x06insert\x01\x03\x01ps\x01j\x01\x04\x01s\x01@\x04\x05stores\x05fields\x02\
+ops\x05values\0\x05\x04\0\x05query\x01\x06\x01@\x05\x05stores\x05fields\x02ops\x05\
+values\x06fields\x01\0\x02\x04\0\x06update\x01\x07\x01@\x04\x05stores\x05fields\x02\
+ops\x05values\0\x02\x04\0\x06delete\x01\x08\x03\0\x17app:caps/kv-store@0.1.0\x05\
+\0\x01B\x02\x01@\x01\x07messages\x01\0\x04\0\x04show\x01\0\x03\0\x14app:caps/toa\
+st@0.1.0\x05\x01\x01B\x02\x01@\x02\x04paths\x05values\x01\0\x04\0\x03set\x01\0\x03\
+\0\x17app:caps/ui-state@0.1.0\x05\x02\x01B\x05\x01r\x02\x04names\x05emails\x04\0\
+\x13save-customer-input\x03\0\0\x01j\0\x01s\x01@\x01\x05input\x01\0\x02\x04\0\x06\
+invoke\x01\x03\x04\0\x20app:customer/save-customer@0.1.0\x05\x03\x04\0%app:custo\
+mer/save-customer-body@0.1.0\x04\0\x0b\x18\x01\0\x12save-customer-body\x03\0\0\0\
+G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindge\
+n-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

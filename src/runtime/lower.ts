@@ -1,4 +1,4 @@
-import type { Action, Expr, Grant, Sig, TypeRef, Value } from "../kernel/types";
+import type { Action, Expr, Grant, Sig, TypeRef } from "../kernel/types";
 
 // IR → Rust lowering (BUILD_SPEC.md §6): "Action-IR bodies are lowered to
 // Rust and compiled through the identical pipeline, so shipped behavior has
@@ -7,10 +7,10 @@ import type { Action, Expr, Grant, Sig, TypeRef, Value } from "../kernel/types";
 // equivalence is by construction, not coincidence.
 //
 // Self-contained (only `import type`) so the build script can load it under
-// node --experimental-strip-types. Coverage is the save-customer action set:
-// Validate(nonEmpty), KvInsert (string record values), Toast, SetState (lit).
-// Anything else throws LoweringError — the honest boundary; KvUpdate/KvDelete,
-// KvQuery/Branch, and var-sourced SetState are the next lowering increment.
+// node --experimental-strip-types. Coverage: Validate(nonEmpty), KvInsert,
+// KvQuery, KvUpdate, KvDelete, Toast, SetState, with var/lit string values.
+// Record(store) inputs, nested vars, and non-string filter/state vars throw
+// LoweringError — the next increment.
 
 export class LoweringError extends Error {
   override name = "LoweringError";
@@ -59,14 +59,15 @@ function witType(type: TypeRef): string {
 export function loweredWorld(c: LoweringContract): string {
   const iface = kebab(c.name);
   const lines = [`package app:customer@0.1.0;`, "", `interface ${iface} {`];
+  // Bodies are fallible (Validate errors, kv can fail), so invoke always
+  // returns result<_, string> regardless of the contract's declared result —
+  // the Outcome the dispatcher applies is ok|error either way.
   if (c.signature.inputs.length > 0) {
     const fields = c.signature.inputs.map((f) => `${kebab(f.name)}: ${witType(f.type)}`);
     lines.push(`  record ${iface}-input { ${fields.join(", ")} }`);
-    const ret = c.signature.result.t === "error" ? " -> result<_, string>" : "";
-    lines.push(`  invoke: func(input: ${iface}-input)${ret};`);
+    lines.push(`  invoke: func(input: ${iface}-input) -> result<_, string>;`);
   } else {
-    const ret = c.signature.result.t === "error" ? " -> result<_, string>" : "";
-    lines.push(`  invoke: func()${ret};`);
+    lines.push(`  invoke: func() -> result<_, string>;`);
   }
   lines.push("}", "", `world ${iface}-body {`);
   for (const imp of neededImports(c)) lines.push(`  import app:caps/${imp}@0.1.0;`);
@@ -93,68 +94,122 @@ function neededImports(c: LoweringContract): string[] {
 
 // ── Rust body projection ───────────────────────────────────────────────────
 
+const OPS: Record<string, string> = { eq: "eq", neq: "neq", contains: "contains" };
+
 export function loweredRust(c: LoweringContract): string {
   const iface = kebab(c.name);
   const mod = snake(iface);
   const inputType = `${pascal(iface)}Input`;
   const fieldSet = new Set(c.signature.inputs.map((f) => f.name));
+  let needsJsonStr = false;
 
-  const exprRust = (e: Expr): string => {
-    if (e.t === "lit") {
-      if (typeof e.value !== "string") {
-        throw new LoweringError("only string literal record values are lowered");
-      }
-      return `${rustStr(e.value)}.to_string()`;
-    }
-    if (!fieldSet.has(e.name)) throw new LoweringError(`var ${e.name} is not a contract input`);
-    return `input.${snake(e.name)}.clone()`;
+  const fieldRef = (name: string): string => {
+    if (name.includes(".")) throw new LoweringError(`nested var ${name} (record input) not lowered yet`);
+    if (!fieldSet.has(name)) throw new LoweringError(`var ${name} is not a contract input`);
+    return `input.${snake(name)}`;
   };
 
+  // A kv record/set value (must be a string in v0 kv).
+  const recordValue = (e: Expr): string => {
+    if (e.t === "lit") {
+      if (typeof e.value !== "string") throw new LoweringError("only string kv values are lowered");
+      return `${rustStr(e.value)}.to_string()`;
+    }
+    return `${fieldRef(e.name)}.clone()`;
+  };
+
+  // A JSON-encoded filter value param: lit encoded at codegen, var via json_str.
+  const filterValue = (e: Expr): string => {
+    if (e.t === "lit") return rustStr(JSON.stringify(e.value));
+    needsJsonStr = true;
+    return `&json_str(&${fieldRef(e.name)})`;
+  };
+
+  const tuples = (rec: Record<string, Expr>): string[] =>
+    Object.entries(rec).map(([k, v]) => `(${rustStr(k)}.to_string(), ${recordValue(v)})`);
+
   const body: string[] = [];
+  const emitTuples = (head: string, tail: string, rec: Record<string, Expr>) => {
+    body.push(`        ${head}`);
+    for (const t of tuples(rec)) body.push(`            ${t},`);
+    body.push(`        ${tail}`);
+  };
+
   for (const action of c.seq) {
     switch (action.t) {
       case "Validate": {
         if (action.rule.t !== "nonEmpty") {
           throw new LoweringError(`Validate rule '${action.rule.t}' is not lowered yet`);
         }
-        if (!fieldSet.has(action.var)) {
-          throw new LoweringError(`Validate var ${action.var} is not a contract input`);
-        }
-        body.push(`        if input.${snake(action.var)}.trim().is_empty() {`);
+        body.push(`        if ${fieldRef(action.var)}.trim().is_empty() {`);
         body.push(`            return Err(${rustStr(action.elseError)}.to_string());`);
         body.push(`        }`);
         break;
       }
-      case "KvInsert": {
-        const store = c.storeName(action.store);
-        const tuples = Object.entries(action.record).map(
-          ([k, expr]) => `(${rustStr(k)}.to_string(), ${exprRust(expr)})`,
+      case "KvInsert":
+        emitTuples(`kv_store::insert(${rustStr(c.storeName(action.store))}, &[`, `])?;`, action.record);
+        break;
+      case "KvUpdate":
+        emitTuples(
+          `kv_store::update(${rustStr(c.storeName(action.store))}, ${rustStr(action.where.field)}, ${rustStr(OPS[action.where.op]!)}, ${filterValue(action.where.value)}, &[`,
+          `])?;`,
+          action.set,
         );
-        body.push(`        kv_store::insert(${rustStr(store)}, &[`);
-        for (const t of tuples) body.push(`            ${t},`);
-        body.push(`        ])?;`);
         break;
-      }
-      case "Toast": {
-        body.push(`        ${toastCall(action.template, fieldSet)}`);
+      case "KvDelete":
+        body.push(
+          `        kv_store::delete(${rustStr(c.storeName(action.store))}, ${rustStr(action.where.field)}, ${rustStr(OPS[action.where.op]!)}, ${filterValue(action.where.value)})?;`,
+        );
         break;
-      }
+      case "KvQuery":
+        throw new LoweringError("KvQuery + Branch are not lowered yet");
+      case "Toast":
+        body.push(`        ${toastCall(action.template, fieldRef)}`);
+        break;
       case "SetState": {
-        if (action.from.t !== "lit") {
-          throw new LoweringError("only literal SetState values are lowered yet");
+        if (action.from.t === "lit") {
+          body.push(
+            `        ui_state::set(${rustStr(action.path)}, ${rustStr(JSON.stringify(action.from.value))});`,
+          );
+        } else {
+          needsJsonStr = true;
+          body.push(`        ui_state::set(${rustStr(action.path)}, &json_str(&${fieldRef(action.from.name)}));`);
         }
-        const json = JSON.stringify(action.from.value satisfies Value);
-        body.push(`        ui_state::set(${rustStr(action.path)}, ${rustStr(json)});`);
         break;
       }
-      default:
-        throw new LoweringError(`action '${action.t}' is not lowered yet`);
+      case "Navigate":
+        body.push(`        nav::go(${rustStr(action.route)});`);
+        break;
+      case "Branch":
+        throw new LoweringError("Branch is not lowered yet");
     }
   }
 
   const uses = neededImports(c)
     .map((imp) => `use bindings::app::caps::${snake(imp)};`)
     .join("\n");
+
+  const helper = needsJsonStr
+    ? `
+// Minimal JSON string encoder so filter/state values round-trip to the host
+// as the exact Value (no serde dependency for the v0 string case).
+fn json_str(s: &str) -> String {
+    let mut o = String::from("\\"");
+    for c in s.chars() {
+        match c {
+            '"' => o.push_str("\\\\\\""),
+            '\\\\' => o.push_str("\\\\\\\\"),
+            '\\n' => o.push_str("\\\\n"),
+            '\\r' => o.push_str("\\\\r"),
+            '\\t' => o.push_str("\\\\t"),
+            _ => o.push(c),
+        }
+    }
+    o.push('"');
+    o
+}
+`
+    : "";
 
   return `// @generated by src/runtime/lower.ts from the ${iface} action-IR body.
 // One implementation: this Rust is lowered from the same IR the interpreter
@@ -173,16 +228,15 @@ ${body.join("\n")}
         Ok(())
     }
 }
-
+${helper}
 bindings::export!(Component with_types_in bindings);
 `;
 }
 
-function toastCall(template: string, fields: Set<string>): string {
+function toastCall(template: string, fieldRef: (name: string) => string): string {
   const args: string[] = [];
   const fmt = template.replace(/\{([\w.]+)\}/g, (_, name: string) => {
-    if (!fields.has(name)) throw new LoweringError(`toast var ${name} is not a contract input`);
-    args.push(`input.${snake(name)}`);
+    args.push(fieldRef(name));
     return "{}";
   });
   if (args.length === 0) return `toast::show(${rustStr(fmt)});`;

@@ -41,13 +41,21 @@ editor changes nothing the user can observe — the product thesis.
   plus a lowering snapshot. Runs on the committed transpiled artifact, so CI
   needs no Rust toolchain.
 
-**M2 finding, resolved:** `SetState` now lowers via the `ui-state` base
-capability, so the compiled body clears the form inputs exactly as the
-interpreter does — verified live and in the drift corpus.
+**M2 edges finished:**
+- **Live build endpoint** — `vite.config.ts` adds a dev middleware
+  `POST /api/build-component`; the contract editor's **⚙ compile to Rust**
+  button lowers the current IR, compiles, and swaps in the result without
+  leaving the browser. The Rust toolchain is a sidecar of the dev server —
+  the concrete proof that no thick desktop IDE is needed. Absent
+  cargo-component, it returns a clean error.
+- **Lowering increment** — `KvUpdate`/`KvDelete` now lower via a shared
+  filter matcher (`src/runtime/filter.ts`, used identically by interpreter
+  and host) with a no-serde `json_str` value encoder. `delete-customer` is
+  now lowered, built, and drift-tested alongside `save-customer`.
 
-**M2 boundary, documented:** the lowering covers save-customer's actions;
-KvUpdate/KvDelete (delete-customer needs a kv filter mini-language) and
-var-sourced state writes are the next increment before M5 export.
+**Remaining lowering gap (before M5):** `KvQuery`+`Branch` and record-input
+contracts (e.g. `select-customer`) still throw `LoweringError` — the
+interpreter runs them; the compiled path is the next increment.
 
 ## Run
 

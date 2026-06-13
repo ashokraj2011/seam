@@ -1,4 +1,4 @@
-import { For, Show, createMemo } from "solid-js";
+import { For, Show, createMemo, createSignal } from "solid-js";
 import type {
   Action,
   BodyRef,
@@ -13,7 +13,7 @@ import type {
   Value,
 } from "../kernel/types";
 import { actionProblems } from "../runtime/lint";
-import { componentForContract } from "../runtime/registry";
+import { componentForContract, registerDynamic } from "../runtime/registry";
 import { contractToWit } from "../runtime/wit";
 import { newId } from "../shared/nodes";
 import {
@@ -37,6 +37,36 @@ const storeNameOf = (id: string): string =>
 // Session-local stash so "⇄ use action IR" can restore the body an IR↔
 // component swap replaced (undo also works — FillBody carries its inverse).
 const irStash = new Map<ContractId, BodyRef>();
+
+// Live build: POST the contract's IR to the dev-server endpoint, which lowers
+// + compiles + transpiles it, then register the result for invoke-by-hash.
+async function compileToRust(contract: Contract): Promise<string> {
+  if (contract.body.t !== "actionIr") throw new Error("only action-IR bodies compile to Rust");
+  const stores: Record<string, string> = {};
+  for (const s of kernel.state.stores) stores[s.id] = s.name;
+  const spec = {
+    name: contract.name,
+    signature: contract.signature,
+    grants: contract.grants,
+    seq: contract.body.seq,
+    stores,
+  };
+  const res = await fetch("/api/build-component", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(spec),
+  });
+  const data = (await res.json()) as { ok: boolean; manifest?: { name: string; hash: string; export: string; module: string }; error?: string };
+  if (!data.ok || !data.manifest) throw new Error(data.error ?? "build failed");
+  const m = data.manifest;
+  registerDynamic({
+    name: m.name,
+    hash: m.hash,
+    export: m.export,
+    load: () => import(/* @vite-ignore */ `${m.module}?t=${Date.now()}`),
+  });
+  return m.hash;
+}
 
 // ── contracts panel (left rail) ─────────────────────────────────────────────
 
@@ -117,9 +147,25 @@ export function ContractEditorOverlay() {
 
 function Editor(props: { contract: Contract }) {
   const c = () => props.contract;
+  const [compiling, setCompiling] = createSignal(false);
   // The kernel mutates the contract in place — JSX reading c().body alone
   // would never re-render. Route every body read through the version signal.
   const body = createMemo(() => (version(), c().body));
+
+  const compileLive = async () => {
+    setCompiling(true);
+    setStatus(`compiling ${c().name} to Rust…`);
+    try {
+      irStash.set(c().id, structuredClone(c().body));
+      const hash = await compileToRust(c());
+      apply({ t: "FillBody", contract: c().id, body: { t: "component", hash } });
+      setStatus(`compiled ${c().name} → ${hash.slice(0, 18)}…`);
+    } catch (err) {
+      setStatus(`compile failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setCompiling(false);
+    }
+  };
   const vars = createMemo(() => (version(), knownVars(c())));
   const problems = createMemo(() => {
     version();
@@ -255,10 +301,10 @@ function Editor(props: { contract: Contract }) {
             <Show when={body().t === "unfilled"}>
               <button onClick={() => updateBody(() => {})}>Fill with action IR</button>
             </Show>
-            <Show when={body().t !== "component" && componentForContract(c().name)}>
+            <Show when={body().t === "actionIr" && componentForContract(c().name)}>
               {(entry) => (
                 <button
-                  title="swap BodyRef to the compiled Rust component — same contract, same grants"
+                  title="swap to the prebuilt Rust component — instant, no recompile"
                   onClick={() => {
                     irStash.set(c().id, structuredClone(c().body));
                     apply({ t: "FillBody", contract: c().id, body: { t: "component", hash: entry().hash } });
@@ -267,6 +313,15 @@ function Editor(props: { contract: Contract }) {
                   ⇄ use Rust component
                 </button>
               )}
+            </Show>
+            <Show when={body().t === "actionIr"}>
+              <button
+                disabled={compiling()}
+                title="lower this IR to Rust, compile, and swap — via the dev-server build worker"
+                onClick={() => void compileLive()}
+              >
+                {compiling() ? "⚙ compiling…" : "⚙ compile to Rust"}
+              </button>
             </Show>
           </h4>
           <Show when={body().t === "component"}>
