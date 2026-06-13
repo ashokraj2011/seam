@@ -57,6 +57,19 @@ editor changes nothing the user can observe — the product thesis.
 contracts (e.g. `select-customer`) still throw `LoweringError` — the
 interpreter runs them; the compiled path is the next increment.
 
+## Generate an app from a data shape (lock-in-free demo)
+
+The **✨ Generate** button (or `src/studio/generate.ts`) turns an entity + a
+list of fields into a complete, running CRUD app — a store, a bound form, a
+bound table, a delete-with-confirm flow, and `save` / `select` / `delete`
+contracts with the right grants, predicates, and wired inputs. It's the
+on-demand-UI / lock-in-free thesis made concrete: what you get out is graph
+data + interpretable contracts **you own** — no vendor runtime, runnable
+instantly, and each contract can later compile to a portable WASM component.
+The generated structure mirrors the hand-built demo the drift corpus and e2e
+already prove, so a generated app is a proven app (`tests/generate.test.ts`
+drives generate → save → delete through the real dispatcher).
+
 ## Run
 
 ```bash

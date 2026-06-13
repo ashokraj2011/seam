@@ -5,6 +5,7 @@ import { GraphKernel } from "../kernel/kernel";
 import { saveSnapshot, wipeSnapshot } from "../kernel/autosave";
 import { CanvasHost } from "./CanvasHost";
 import { ContractEditorOverlay, ContractsPanel } from "./ContractEditor";
+import { GenerateDialog } from "./GenerateDialog";
 import { Inspector } from "./Inspector";
 import { Palette } from "./Palette";
 import { PagesPanel, StatePanel, StoresPanel } from "./panels";
@@ -17,6 +18,7 @@ import {
   selection,
   setMode,
   setSelection,
+  setShowGenerate,
   setStatus,
   status,
   version,
@@ -140,6 +142,9 @@ export function App() {
         <button disabled={(version(), kernel.redoDepth === 0)} onClick={() => kernel.redo()}>
           Redo
         </button>
+        <button class="s-generate" onClick={() => setShowGenerate(true)}>
+          ✨ Generate
+        </button>
         <button onClick={exportGraph}>Export</button>
         <button onClick={() => importInput.click()}>Import</button>
         <input
@@ -182,6 +187,7 @@ export function App() {
         </span>
       </footer>
       <ContractEditorOverlay />
+      <GenerateDialog />
     </Show>
   );
 }

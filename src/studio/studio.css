@@ -536,6 +536,97 @@ body.s-dragging {
   box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
 }
 
+/* ── generate button + dialog ──────────────────────────────────────────── */
+.s-generate {
+  color: var(--ij-run) !important;
+}
+.s-generate:hover {
+  background: color-mix(in srgb, var(--ij-run) 18%, transparent) !important;
+}
+.s-gen {
+  background: var(--ij-panel);
+  border: 1px solid var(--ij-border-2);
+  border-radius: 8px;
+  width: min(520px, 94vw);
+  max-height: 88vh;
+  overflow: auto;
+  padding: 16px 18px;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 60%);
+}
+.s-gen__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ij-border);
+}
+.s-gen__head strong {
+  font-size: 14px;
+}
+.s-gen h4 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ij-muted);
+  margin: 14px 0 6px;
+}
+.s-gen__starters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.s-gen__starters button {
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid var(--ij-border-2);
+  border-radius: 99px;
+  background: var(--ij-panel-2);
+  color: var(--ij-text);
+  cursor: pointer;
+}
+.s-gen__starters button:hover {
+  border-color: var(--ij-run);
+  color: var(--ij-run);
+}
+.s-gen input,
+.s-gen select,
+.s-gen button {
+  font: inherit;
+  font-size: 12px;
+  color: var(--ij-text);
+  background: var(--ij-bg);
+  border: 1px solid var(--ij-border-2);
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+.s-gen > button {
+  cursor: pointer;
+  background: transparent;
+  margin-top: 4px;
+}
+.s-gen__foot {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ij-border);
+}
+.s-gen__foot p {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.s-gen__go {
+  background: var(--ij-run) !important;
+  color: #fff !important;
+  border-color: var(--ij-run) !important;
+  font-size: 13px !important;
+  padding: 7px 16px !important;
+  cursor: pointer;
+}
+
 /* ── contract editor dialog ────────────────────────────────────────────── */
 .s-contract-overlay {
   position: fixed;

@@ -17,6 +17,7 @@ export const [selection, setSelection] = createSignal<NodeId | null>(null);
 export const [currentPage, setCurrentPage] = createSignal<PageId | null>(null);
 export const [editingContract, setEditingContract] = createSignal<ContractId | null>(null);
 export const [status, setStatus] = createSignal("loading…");
+export const [showGenerate, setShowGenerate] = createSignal(false);
 
 export let kernel: GraphKernel;
 export let kvTables: KvTables | null = null; // persisted kv rows, loaded at boot
