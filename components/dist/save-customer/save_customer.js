@@ -1,6 +1,7 @@
 "use components";
 import { insert } from '../../../src/runtime/caps/kv-store.js';
 import { show } from '../../../src/runtime/caps/toast.js';
+import { set } from '../../../src/runtime/caps/ui-state.js';
 import { environment, exit as exit$1, stderr, stdin, stdout } from '@bytecodealliance/preview2-shim/cli';
 import { preopens, types } from '@bytecodealliance/preview2-shim/filesystem';
 import { error, streams } from '@bytecodealliance/preview2-shim/io';
@@ -4465,7 +4466,92 @@ const _trampoline9 = function(arg0, arg1) {
 }
 _trampoline9.fnName = 'app:caps/toast@0.1.0#show';
 
-const _trampoline10 = function(arg0) {
+const _trampoline10 = function(arg0, arg1, arg2, arg3) {
+  var ptr0 = arg0;
+  var len0 = arg1;
+  var result0 = TEXT_DECODER_UTF8.decode(new Uint8Array(memory0.buffer, ptr0, len0));
+  var ptr1 = arg2;
+  var len1 = arg3;
+  var result1 = TEXT_DECODER_UTF8.decode(new Uint8Array(memory0.buffer, ptr1, len1));
+  _debugLog('[iface="app:caps/ui-state@0.1.0", function="set"] [Instruction::CallInterface] (sync, @ enter)');
+  const hostProvided = true;
+  
+  let parentTask;
+  let task;
+  let subtask;
+  
+  const createTask = () => {
+    const results = createNewCurrentTask({
+      componentIdx: -1,
+      isAsync: false,
+      entryFnName: 'set',
+      getCallbackFn: () => null,
+      callbackFnName: null,
+      errHandling: 'none',
+      callingWasmExport: false,
+    });
+    task = results[0];
+  };
+  
+  taskCreation: {
+    parentTask = getCurrentTask(
+    0,
+    _getGlobalCurrentTaskMeta(0)?.taskID,
+    )?.task;
+    
+    if (!parentTask) {
+      createTask();
+      break taskCreation;
+    }
+    
+    createTask();
+    
+    if (hostProvided) {
+      subtask = parentTask.getLatestSubtask();
+      if (!subtask) {
+        throw new Error(`Missing subtask (in parent task [${parentTask.id()}]) for host import, has the import been lowered? (ensure asyncImports are set properly)`);
+      }
+      task.setParentSubtask(subtask);
+    }
+  }
+  
+  const started = task.enterSync();
+  
+  let ret;
+  
+  try {
+    _withGlobalCurrentTaskMeta({
+      componentIdx: task.componentIdx(),
+      taskID: task.id(),
+      fn: () => set(result0, result1),
+    })
+    ;
+  } catch (err) {
+    
+    _debugLog('[Instruction::CallInterface] error during sync call', {
+      taskID: task.id(),
+      subtaskID: currentSubtask?.id(),
+      err,
+    });
+    task.setErrored(err);
+    task.reject(err);
+    task.exit();
+    throw err;
+    
+  }
+  
+  _debugLog('[iface="app:caps/ui-state@0.1.0", function="set"][Instruction::Return]', {
+    funcName: 'set',
+    paramCount: 0,
+    async: false,
+    postReturn: false
+  });
+  task.resolve([ret]);
+  task.exit();
+}
+_trampoline10.fnName = 'app:caps/ui-state@0.1.0#set';
+
+const _trampoline11 = function(arg0) {
   _debugLog('[iface="wasi:cli/environment@0.2.3", function="get-environment"] [Instruction::CallInterface] (sync, @ enter)');
   const hostProvided = true;
   
@@ -4565,7 +4651,7 @@ const _trampoline10 = function(arg0) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline10.fnName = 'wasi:cli/environment@0.2.3#getEnvironment';
+_trampoline11.fnName = 'wasi:cli/environment@0.2.3#getEnvironment';
 
 const handleTable0 = [T_FLAG, 0];
 handleTable0._createdReps = new Set();
@@ -4576,7 +4662,7 @@ let captureCnt0= 0;
 
 HANDLE_TABLES[0] = handleTable0;
 
-const _trampoline11 = function(arg0, arg1) {
+const _trampoline12 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable0[(handle1 << 1) + 1] & ~T_FLAG;
@@ -4835,7 +4921,7 @@ const _trampoline11 = function(arg0, arg1) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline11.fnName = 'wasi:filesystem/types@0.2.3#filesystemErrorCode';
+_trampoline12.fnName = 'wasi:filesystem/types@0.2.3#filesystemErrorCode';
 
 const handleTable3 = [T_FLAG, 0];
 handleTable3._createdReps = new Set();
@@ -4846,7 +4932,7 @@ let captureCnt3= 0;
 
 HANDLE_TABLES[3] = handleTable3;
 
-const _trampoline12 = function(arg0, arg1, arg2) {
+const _trampoline13 = function(arg0, arg1, arg2) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5118,9 +5204,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.wr
 task.resolve([ret]);
 task.exit();
 }
-_trampoline12.fnName = 'wasi:filesystem/types@0.2.3#writeViaStream';
+_trampoline13.fnName = 'wasi:filesystem/types@0.2.3#writeViaStream';
 
-const _trampoline13 = function(arg0, arg1) {
+const _trampoline14 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5392,9 +5478,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.ap
 task.resolve([ret]);
 task.exit();
 }
-_trampoline13.fnName = 'wasi:filesystem/types@0.2.3#appendViaStream';
+_trampoline14.fnName = 'wasi:filesystem/types@0.2.3#appendViaStream';
 
-const _trampoline14 = function(arg0, arg1) {
+const _trampoline15 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -5698,9 +5784,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.ge
 task.resolve([ret]);
 task.exit();
 }
-_trampoline14.fnName = 'wasi:filesystem/types@0.2.3#getType';
+_trampoline15.fnName = 'wasi:filesystem/types@0.2.3#getType';
 
-const _trampoline15 = function(arg0, arg1) {
+const _trampoline16 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable3[(handle1 << 1) + 1] & ~T_FLAG;
@@ -6037,9 +6123,9 @@ _debugLog('[iface="wasi:filesystem/types@0.2.3", function="[method]descriptor.st
 task.resolve([ret]);
 task.exit();
 }
-_trampoline15.fnName = 'wasi:filesystem/types@0.2.3#stat';
+_trampoline16.fnName = 'wasi:filesystem/types@0.2.3#stat';
 
-const _trampoline16 = function(arg0, arg1) {
+const _trampoline17 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -6167,9 +6253,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.check
 task.resolve([ret]);
 task.exit();
 }
-_trampoline16.fnName = 'wasi:io/streams@0.2.3#checkWrite';
+_trampoline17.fnName = 'wasi:io/streams@0.2.3#checkWrite';
 
-const _trampoline17 = function(arg0, arg1, arg2, arg3) {
+const _trampoline18 = function(arg0, arg1, arg2, arg3) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -6299,9 +6385,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.write
 task.resolve([ret]);
 task.exit();
 }
-_trampoline17.fnName = 'wasi:io/streams@0.2.3#write';
+_trampoline18.fnName = 'wasi:io/streams@0.2.3#write';
 
-const _trampoline18 = function(arg0, arg1) {
+const _trampoline19 = function(arg0, arg1) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -6428,9 +6514,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.block
 task.resolve([ret]);
 task.exit();
 }
-_trampoline18.fnName = 'wasi:io/streams@0.2.3#blockingFlush';
+_trampoline19.fnName = 'wasi:io/streams@0.2.3#blockingFlush';
 
-const _trampoline19 = function(arg0, arg1, arg2, arg3) {
+const _trampoline20 = function(arg0, arg1, arg2, arg3) {
   var handle1 = arg0;
   
   var rep2 = handleTable1[(handle1 << 1) + 1] & ~T_FLAG;
@@ -6560,9 +6646,9 @@ _debugLog('[iface="wasi:io/streams@0.2.3", function="[method]output-stream.block
 task.resolve([ret]);
 task.exit();
 }
-_trampoline19.fnName = 'wasi:io/streams@0.2.3#blockingWriteAndFlush';
+_trampoline20.fnName = 'wasi:io/streams@0.2.3#blockingWriteAndFlush';
 
-const _trampoline20 = function(arg0) {
+const _trampoline21 = function(arg0) {
   _debugLog('[iface="wasi:filesystem/preopens@0.2.3", function="get-directories"] [Instruction::CallInterface] (sync, @ enter)');
   const hostProvided = true;
   
@@ -6667,7 +6753,7 @@ const _trampoline20 = function(arg0) {
   task.resolve([ret]);
   task.exit();
 }
-_trampoline20.fnName = 'wasi:filesystem/preopens@0.2.3#getDirectories';
+_trampoline21.fnName = 'wasi:filesystem/preopens@0.2.3#getDirectories';
 let exports3;
 let postReturn0;
 let postReturn0Async;
@@ -7198,13 +7284,9 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline10.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({
-    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatStringAny, 8, 4],[_lowerFlatStringAny, 8, 4],], size32: 16, align32: 4 }),
-    elemSize32: 16,
-    elemAlign32: 4,
-  })],
-  hasResultPointer: true,
+  paramLiftFns: [_liftFlatStringAny,_liftFlatStringAny],
+  resultLowerFns: [],
+  hasResultPointer: false,
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -7212,7 +7294,7 @@ null,
   memoryIdx: 0,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
-  getReallocFn: () => realloc1,
+  getReallocFn: undefined,
   importFn: _trampoline10,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -7222,13 +7304,9 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline10.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({
-    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatStringAny, 8, 4],[_lowerFlatStringAny, 8, 4],], size32: 16, align32: 4 }),
-    elemSize32: 16,
-    elemAlign32: 4,
-  })],
-  hasResultPointer: true,
+  paramLiftFns: [_liftFlatStringAny,_liftFlatStringAny],
+  resultLowerFns: [],
+  hasResultPointer: false,
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
   getPostReturnFn: () => null,
@@ -7236,7 +7314,7 @@ null,
   memoryIdx: 0,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
-  getReallocFn: () => realloc1,
+  getReallocFn: undefined,
   importFn: _trampoline10,
 },
 );
@@ -7247,12 +7325,12 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline11.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
-  resultLowerFns: [_lowerFlatOption([
-  [ 'none', null, 2, 1, 1 ],
-  [ 'some', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
-  ])
-  ],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({
+    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatStringAny, 8, 4],[_lowerFlatStringAny, 8, 4],], size32: 16, align32: 4 }),
+    elemSize32: 16,
+    elemAlign32: 4,
+  })],
   hasResultPointer: true,
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -7261,7 +7339,7 @@ null,
   memoryIdx: 0,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
-  getReallocFn: undefined,
+  getReallocFn: () => realloc1,
   importFn: _trampoline11,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -7271,12 +7349,12 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline11.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
-  resultLowerFns: [_lowerFlatOption([
-  [ 'none', null, 2, 1, 1 ],
-  [ 'some', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
-  ])
-  ],
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({
+    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatStringAny, 8, 4],[_lowerFlatStringAny, 8, 4],], size32: 16, align32: 4 }),
+    elemSize32: 16,
+    elemAlign32: 4,
+  })],
   hasResultPointer: true,
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -7285,7 +7363,7 @@ null,
   memoryIdx: 0,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
-  getReallocFn: undefined,
+  getReallocFn: () => realloc1,
   importFn: _trampoline11,
 },
 );
@@ -7296,26 +7374,10 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline12.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
-  resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatOwn({
-    componentIdx: 0,
-    lowerFn: 
-    function lowerImportedOwnedHost_OutputStream(obj) {
-      if (!(obj instanceof OutputStream)) {
-        throw new TypeError('Resource error: Not a valid \"OutputStream\" resource.');
-      }
-      let handle = obj[symbolRscHandle];
-      if (!handle) {
-        const rep = obj[symbolRscRep] || ++captureCnt1;
-        captureTable1.set(rep, obj);
-        handle = rscTableCreateOwn(handleTable1, rep);
-      }
-      return handle;
-    }
-    ,
-  }), 8, 4, 4 ],
-  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 8, 4, 4 ],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
+  resultLowerFns: [_lowerFlatOption([
+  [ 'none', null, 2, 1, 1 ],
+  [ 'some', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
   ])
   ],
   hasResultPointer: true,
@@ -7336,26 +7398,10 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline12.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
-  resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatOwn({
-    componentIdx: 0,
-    lowerFn: 
-    function lowerImportedOwnedHost_OutputStream(obj) {
-      if (!(obj instanceof OutputStream)) {
-        throw new TypeError('Resource error: Not a valid \"OutputStream\" resource.');
-      }
-      let handle = obj[symbolRscHandle];
-      if (!handle) {
-        const rep = obj[symbolRscRep] || ++captureCnt1;
-        captureTable1.set(rep, obj);
-        handle = rscTableCreateOwn(handleTable1, rep);
-      }
-      return handle;
-    }
-    ,
-  }), 8, 4, 4 ],
-  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 8, 4, 4 ],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 0)],
+  resultLowerFns: [_lowerFlatOption([
+  [ 'none', null, 2, 1, 1 ],
+  [ 'some', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
   ])
   ],
   hasResultPointer: true,
@@ -7377,7 +7423,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline13.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', _lowerFlatOwn({
     componentIdx: 0,
@@ -7417,7 +7463,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline13.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3),_liftFlatU64],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', _lowerFlatOwn({
     componentIdx: 0,
@@ -7460,8 +7506,24 @@ null,
   isManualAsync: _trampoline14.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 2, 1, 1 ],
-  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
+  [ 'ok', _lowerFlatOwn({
+    componentIdx: 0,
+    lowerFn: 
+    function lowerImportedOwnedHost_OutputStream(obj) {
+      if (!(obj instanceof OutputStream)) {
+        throw new TypeError('Resource error: Not a valid \"OutputStream\" resource.');
+      }
+      let handle = obj[symbolRscHandle];
+      if (!handle) {
+        const rep = obj[symbolRscRep] || ++captureCnt1;
+        captureTable1.set(rep, obj);
+        handle = rscTableCreateOwn(handleTable1, rep);
+      }
+      return handle;
+    }
+    ,
+  }), 8, 4, 4 ],
+  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 8, 4, 4 ],
   ])
   ],
   hasResultPointer: true,
@@ -7484,8 +7546,24 @@ null,
   isManualAsync: _trampoline14.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 2, 1, 1 ],
-  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
+  [ 'ok', _lowerFlatOwn({
+    componentIdx: 0,
+    lowerFn: 
+    function lowerImportedOwnedHost_OutputStream(obj) {
+      if (!(obj instanceof OutputStream)) {
+        throw new TypeError('Resource error: Not a valid \"OutputStream\" resource.');
+      }
+      let handle = obj[symbolRscHandle];
+      if (!handle) {
+        const rep = obj[symbolRscRep] || ++captureCnt1;
+        captureTable1.set(rep, obj);
+        handle = rscTableCreateOwn(handleTable1, rep);
+      }
+      return handle;
+    }
+    ,
+  }), 8, 4, 4 ],
+  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 8, 4, 4 ],
   ])
   ],
   hasResultPointer: true,
@@ -7509,20 +7587,8 @@ null,
   isManualAsync: _trampoline15.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatRecord({ fieldMetas: [['type', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 1, 1 ],['linkCount', _lowerFlatU64, 8, 8 ],['size', _lowerFlatU64, 8, 8 ],['dataAccessTimestamp', _lowerFlatOption([
-  [ 'none', null, 24, 8, 8 ],
-  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
-  ])
-  , 24, 8 ],['dataModificationTimestamp', _lowerFlatOption([
-  [ 'none', null, 24, 8, 8 ],
-  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
-  ])
-  , 24, 8 ],['statusChangeTimestamp', _lowerFlatOption([
-  [ 'none', null, 24, 8, 8 ],
-  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
-  ])
-  , 24, 8 ],], size32: 96, align32: 8 }), 104, 8, 8 ],
-  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 104, 8, 8 ],
+  [ 'ok', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 2, 1, 1 ],
+  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
   ])
   ],
   hasResultPointer: true,
@@ -7543,6 +7609,31 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline15.manuallyAsync,
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
+  resultLowerFns: [_lowerFlatResult([
+  [ 'ok', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 2, 1, 1 ],
+  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 2, 1, 1 ],
+  ])
+  ],
+  hasResultPointer: true,
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: 0,
+  stringEncoding: 'utf8',
+  getMemoryFn: () => memory0,
+  getReallocFn: undefined,
+  importFn: _trampoline15,
+},
+);
+let trampoline16 = _trampoline16.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 16,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline16.manuallyAsync,
   paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', _lowerFlatRecord({ fieldMetas: [['type', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 1, 1 ],['linkCount', _lowerFlatU64, 8, 8 ],['size', _lowerFlatU64, 8, 8 ],['dataAccessTimestamp', _lowerFlatOption([
@@ -7570,47 +7661,6 @@ null,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
   getReallocFn: undefined,
-  importFn: _trampoline15,
-},
-);
-let trampoline16 = _trampoline16.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
-null,
-{
-  trampolineIdx: 16,
-  componentIdx: 0,
-  isAsync: false,
-  isManualAsync: _trampoline16.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
-  resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatU64, 16, 8, 8 ],
-  [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
-    componentIdx: 0,
-    lowerFn: 
-    function lowerImportedOwnedHost_Error$1(obj) {
-      if (!(obj instanceof Error$1)) {
-        throw new TypeError('Resource error: Not a valid \"Error$1\" resource.');
-      }
-      let handle = obj[symbolRscHandle];
-      if (!handle) {
-        const rep = obj[symbolRscRep] || ++captureCnt0;
-        captureTable0.set(rep, obj);
-        handle = rscTableCreateOwn(handleTable0, rep);
-      }
-      return handle;
-    }
-    ,
-  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],
-  ])
-  ],
-  hasResultPointer: true,
-  funcTypeIsAsync: false,
-  getCallbackFn: () => null,
-  getPostReturnFn: () => null,
-  isCancellable: false,
-  memoryIdx: 0,
-  stringEncoding: 'utf8',
-  getMemoryFn: () => memory0,
-  getReallocFn: undefined,
   importFn: _trampoline16,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -7620,26 +7670,22 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline16.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 3)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', _lowerFlatU64, 16, 8, 8 ],
-  [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
-    componentIdx: 0,
-    lowerFn: 
-    function lowerImportedOwnedHost_Error$1(obj) {
-      if (!(obj instanceof Error$1)) {
-        throw new TypeError('Resource error: Not a valid \"Error$1\" resource.');
-      }
-      let handle = obj[symbolRscHandle];
-      if (!handle) {
-        const rep = obj[symbolRscRep] || ++captureCnt0;
-        captureTable0.set(rep, obj);
-        handle = rscTableCreateOwn(handleTable0, rep);
-      }
-      return handle;
-    }
-    ,
-  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],
+  [ 'ok', _lowerFlatRecord({ fieldMetas: [['type', _lowerFlatEnum([['unknown', null, 1, 1, 1],['block-device', null, 1, 1, 1],['character-device', null, 1, 1, 1],['directory', null, 1, 1, 1],['fifo', null, 1, 1, 1],['symbolic-link', null, 1, 1, 1],['regular-file', null, 1, 1, 1],['socket', null, 1, 1, 1],]), 1, 1 ],['linkCount', _lowerFlatU64, 8, 8 ],['size', _lowerFlatU64, 8, 8 ],['dataAccessTimestamp', _lowerFlatOption([
+  [ 'none', null, 24, 8, 8 ],
+  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
+  ])
+  , 24, 8 ],['dataModificationTimestamp', _lowerFlatOption([
+  [ 'none', null, 24, 8, 8 ],
+  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
+  ])
+  , 24, 8 ],['statusChangeTimestamp', _lowerFlatOption([
+  [ 'none', null, 24, 8, 8 ],
+  [ 'some', _lowerFlatRecord({ fieldMetas: [['seconds', _lowerFlatU64, 8, 8 ],['nanoseconds', _lowerFlatU32, 4, 4 ],], size32: 16, align32: 8 }), 24, 8, 8 ],
+  ])
+  , 24, 8 ],], size32: 96, align32: 8 }), 104, 8, 8 ],
+  [ 'err', _lowerFlatEnum([['access', null, 1, 1, 1],['would-block', null, 1, 1, 1],['already', null, 1, 1, 1],['bad-descriptor', null, 1, 1, 1],['busy', null, 1, 1, 1],['deadlock', null, 1, 1, 1],['quota', null, 1, 1, 1],['exist', null, 1, 1, 1],['file-too-large', null, 1, 1, 1],['illegal-byte-sequence', null, 1, 1, 1],['in-progress', null, 1, 1, 1],['interrupted', null, 1, 1, 1],['invalid', null, 1, 1, 1],['io', null, 1, 1, 1],['is-directory', null, 1, 1, 1],['loop', null, 1, 1, 1],['too-many-links', null, 1, 1, 1],['message-size', null, 1, 1, 1],['name-too-long', null, 1, 1, 1],['no-device', null, 1, 1, 1],['no-entry', null, 1, 1, 1],['no-lock', null, 1, 1, 1],['insufficient-memory', null, 1, 1, 1],['insufficient-space', null, 1, 1, 1],['not-directory', null, 1, 1, 1],['not-empty', null, 1, 1, 1],['not-recoverable', null, 1, 1, 1],['unsupported', null, 1, 1, 1],['no-tty', null, 1, 1, 1],['no-such-device', null, 1, 1, 1],['overflow', null, 1, 1, 1],['not-permitted', null, 1, 1, 1],['pipe', null, 1, 1, 1],['read-only', null, 1, 1, 1],['invalid-seek', null, 1, 1, 1],['text-file-busy', null, 1, 1, 1],['cross-device', null, 1, 1, 1],]), 104, 8, 8 ],
   ])
   ],
   hasResultPointer: true,
@@ -7661,14 +7707,9 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline17.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
-    elemLiftFn: _liftFlatU8,
-    elemAlign32: 1,
-    elemSize32: 1,
-    typedArray: Uint8Array,
-  })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', null, 12, 4, 4 ],
+  [ 'ok', _lowerFlatU64, 16, 8, 8 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
     componentIdx: 0,
     lowerFn: 
@@ -7685,7 +7726,7 @@ null,
       return handle;
     }
     ,
-  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],
+  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],
   ])
   ],
   hasResultPointer: true,
@@ -7706,14 +7747,9 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline17.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
-    elemLiftFn: _liftFlatU8,
-    elemAlign32: 1,
-    elemSize32: 1,
-    typedArray: Uint8Array,
-  })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([
-  [ 'ok', null, 12, 4, 4 ],
+  [ 'ok', _lowerFlatU64, 16, 8, 8 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
     componentIdx: 0,
     lowerFn: 
@@ -7730,7 +7766,7 @@ null,
       return handle;
     }
     ,
-  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],
+  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 16, 8, 8 ],
   ])
   ],
   hasResultPointer: true,
@@ -7752,7 +7788,12 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline18.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
+    elemLiftFn: _liftFlatU8,
+    elemAlign32: 1,
+    elemSize32: 1,
+    typedArray: Uint8Array,
+  })],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', null, 12, 4, 4 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
@@ -7792,7 +7833,12 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline18.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
+    elemLiftFn: _liftFlatU8,
+    elemAlign32: 1,
+    elemSize32: 1,
+    typedArray: Uint8Array,
+  })],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', null, 12, 4, 4 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
@@ -7833,12 +7879,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline19.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
-    elemLiftFn: _liftFlatU8,
-    elemAlign32: 1,
-    elemSize32: 1,
-    typedArray: Uint8Array,
-  })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', null, 12, 4, 4 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
@@ -7878,12 +7919,7 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline19.manuallyAsync,
-  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
-    elemLiftFn: _liftFlatU8,
-    elemAlign32: 1,
-    elemSize32: 1,
-    typedArray: Uint8Array,
-  })],
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1)],
   resultLowerFns: [_lowerFlatResult([
   [ 'ok', null, 12, 4, 4 ],
   [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
@@ -7924,28 +7960,33 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline20.manuallyAsync,
-  paramLiftFns: [],
-  resultLowerFns: [_lowerFlatList({
-    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatOwn({
-      componentIdx: 0,
-      lowerFn: 
-      function lowerImportedOwnedHost_Descriptor(obj) {
-        if (!(obj instanceof Descriptor)) {
-          throw new TypeError('Resource error: Not a valid \"Descriptor\" resource.');
-        }
-        let handle = obj[symbolRscHandle];
-        if (!handle) {
-          const rep = obj[symbolRscRep] || ++captureCnt3;
-          captureTable3.set(rep, obj);
-          handle = rscTableCreateOwn(handleTable3, rep);
-        }
-        return handle;
-      }
-      ,
-    }), 4, 4],[_lowerFlatStringAny, 8, 4],], size32: 12, align32: 4 }),
-    elemSize32: 12,
-    elemAlign32: 4,
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
+    elemLiftFn: _liftFlatU8,
+    elemAlign32: 1,
+    elemSize32: 1,
+    typedArray: Uint8Array,
   })],
+  resultLowerFns: [_lowerFlatResult([
+  [ 'ok', null, 12, 4, 4 ],
+  [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
+    componentIdx: 0,
+    lowerFn: 
+    function lowerImportedOwnedHost_Error$1(obj) {
+      if (!(obj instanceof Error$1)) {
+        throw new TypeError('Resource error: Not a valid \"Error$1\" resource.');
+      }
+      let handle = obj[symbolRscHandle];
+      if (!handle) {
+        const rep = obj[symbolRscRep] || ++captureCnt0;
+        captureTable0.set(rep, obj);
+        handle = rscTableCreateOwn(handleTable0, rep);
+      }
+      return handle;
+    }
+    ,
+  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],
+  ])
+  ],
   hasResultPointer: true,
   funcTypeIsAsync: false,
   getCallbackFn: () => null,
@@ -7954,7 +7995,7 @@ null,
   memoryIdx: 0,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
-  getReallocFn: () => realloc1,
+  getReallocFn: undefined,
   importFn: _trampoline20,
 },
 )) : _lowerImportBackwardsCompat.bind(
@@ -7964,6 +8005,52 @@ null,
   componentIdx: 0,
   isAsync: false,
   isManualAsync: _trampoline20.manuallyAsync,
+  paramLiftFns: [_liftFlatBorrow.bind(null, 1),_liftFlatList({
+    elemLiftFn: _liftFlatU8,
+    elemAlign32: 1,
+    elemSize32: 1,
+    typedArray: Uint8Array,
+  })],
+  resultLowerFns: [_lowerFlatResult([
+  [ 'ok', null, 12, 4, 4 ],
+  [ 'err', _lowerFlatVariant([[ 'last-operation-failed', _lowerFlatOwn({
+    componentIdx: 0,
+    lowerFn: 
+    function lowerImportedOwnedHost_Error$1(obj) {
+      if (!(obj instanceof Error$1)) {
+        throw new TypeError('Resource error: Not a valid \"Error$1\" resource.');
+      }
+      let handle = obj[symbolRscHandle];
+      if (!handle) {
+        const rep = obj[symbolRscRep] || ++captureCnt0;
+        captureTable0.set(rep, obj);
+        handle = rscTableCreateOwn(handleTable0, rep);
+      }
+      return handle;
+    }
+    ,
+  }), 8, 4, 4 ],[ 'closed', null, 8, 4, 4 ],]), 12, 4, 4 ],
+  ])
+  ],
+  hasResultPointer: true,
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: 0,
+  stringEncoding: 'utf8',
+  getMemoryFn: () => memory0,
+  getReallocFn: undefined,
+  importFn: _trampoline20,
+},
+);
+let trampoline21 = _trampoline21.manuallyAsync ? new WebAssembly.Suspending(_lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 21,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline21.manuallyAsync,
   paramLiftFns: [],
   resultLowerFns: [_lowerFlatList({
     elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatOwn({
@@ -7995,7 +8082,47 @@ null,
   stringEncoding: 'utf8',
   getMemoryFn: () => memory0,
   getReallocFn: () => realloc1,
-  importFn: _trampoline20,
+  importFn: _trampoline21,
+},
+)) : _lowerImportBackwardsCompat.bind(
+null,
+{
+  trampolineIdx: 21,
+  componentIdx: 0,
+  isAsync: false,
+  isManualAsync: _trampoline21.manuallyAsync,
+  paramLiftFns: [],
+  resultLowerFns: [_lowerFlatList({
+    elemLowerFn: _lowerFlatTuple({ elemLowerMetas: [[_lowerFlatOwn({
+      componentIdx: 0,
+      lowerFn: 
+      function lowerImportedOwnedHost_Descriptor(obj) {
+        if (!(obj instanceof Descriptor)) {
+          throw new TypeError('Resource error: Not a valid \"Descriptor\" resource.');
+        }
+        let handle = obj[symbolRscHandle];
+        if (!handle) {
+          const rep = obj[symbolRscRep] || ++captureCnt3;
+          captureTable3.set(rep, obj);
+          handle = rscTableCreateOwn(handleTable3, rep);
+        }
+        return handle;
+      }
+      ,
+    }), 4, 4],[_lowerFlatStringAny, 8, 4],], size32: 12, align32: 4 }),
+    elemSize32: 12,
+    elemAlign32: 4,
+  })],
+  hasResultPointer: true,
+  funcTypeIsAsync: false,
+  getCallbackFn: () => null,
+  getPostReturnFn: () => null,
+  isCancellable: false,
+  memoryIdx: 0,
+  stringEncoding: 'utf8',
+  getMemoryFn: () => memory0,
+  getReallocFn: () => realloc1,
+  importFn: _trampoline21,
 },
 );
 
@@ -8003,8 +8130,8 @@ const $init = (() => {
   let gen = (function* _initGenerator () {
     const module0 = fetchCompile(new URL('./save_customer.core.wasm', import.meta.url));
     const module1 = fetchCompile(new URL('./save_customer.core2.wasm', import.meta.url));
-    const module2 = base64Compile('AGFzbQEAAAABNglgBX9/f39/AGACf38AYAR/f39/AX9gAn9/AX9gAX8AYAF/AGACf38AYAN/fn8AYAR/f39/AAMSEQABAgMDBAUGBwYGBgYIBggFBAUBcAEREQdXEgEwAAABMQABATIAAgEzAAMBNAAEATUABQE2AAYBNwAHATgACAE5AAkCMTAACgIxMQALAjEyAAwCMTMADQIxNAAOAjE1AA8CMTYAEAgkaW1wb3J0cwEACtsBEREAIAAgASACIAMgBEEAEQAACwsAIAAgAUEBEQEACw8AIAAgASACIANBAhECAAsLACAAIAFBAxEDAAsLACAAIAFBBBEDAAsJACAAQQURBAALCQAgAEEGEQUACwsAIAAgAUEHEQYACw0AIAAgASACQQgRBwALCwAgACABQQkRBgALCwAgACABQQoRBgALCwAgACABQQsRBgALCwAgACABQQwRBgALDwAgACABIAIgA0ENEQgACwsAIAAgAUEOEQYACw8AIAAgASACIANBDxEIAAsJACAAQRARBQALAC8JcHJvZHVjZXJzAQxwcm9jZXNzZWQtYnkBDXdpdC1jb21wb25lbnQHMC4yMjcuMQDlBwRuYW1lABMSd2l0LWNvbXBvbmVudDpzaGltAcgHEQAnaW5kaXJlY3QtYXBwOmNhcHMva3Ytc3RvcmVAMC4xLjAtaW5zZXJ0ASJpbmRpcmVjdC1hcHA6Y2Fwcy90b2FzdEAwLjEuMC1zaG93AiVhZGFwdC13YXNpX3NuYXBzaG90X3ByZXZpZXcxLWZkX3dyaXRlAyhhZGFwdC13YXNpX3NuYXBzaG90X3ByZXZpZXcxLWVudmlyb25fZ2V0BC5hZGFwdC13YXNpX3NuYXBzaG90X3ByZXZpZXcxLWVudmlyb25fc2l6ZXNfZ2V0BSZhZGFwdC13YXNpX3NuYXBzaG90X3ByZXZpZXcxLXByb2NfZXhpdAYzaW5kaXJlY3Qtd2FzaTpjbGkvZW52aXJvbm1lbnRAMC4yLjMtZ2V0LWVudmlyb25tZW50BzppbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vdHlwZXNAMC4yLjMtZmlsZXN5c3RlbS1lcnJvci1jb2RlCEhpbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vdHlwZXNAMC4yLjMtW21ldGhvZF1kZXNjcmlwdG9yLndyaXRlLXZpYS1zdHJlYW0JSWluZGlyZWN0LXdhc2k6ZmlsZXN5c3RlbS90eXBlc0AwLjIuMy1bbWV0aG9kXWRlc2NyaXB0b3IuYXBwZW5kLXZpYS1zdHJlYW0KQGluZGlyZWN0LXdhc2k6ZmlsZXN5c3RlbS90eXBlc0AwLjIuMy1bbWV0aG9kXWRlc2NyaXB0b3IuZ2V0LXR5cGULPGluZGlyZWN0LXdhc2k6ZmlsZXN5c3RlbS90eXBlc0AwLjIuMy1bbWV0aG9kXWRlc2NyaXB0b3Iuc3RhdAxAaW5kaXJlY3Qtd2FzaTppby9zdHJlYW1zQDAuMi4zLVttZXRob2Rdb3V0cHV0LXN0cmVhbS5jaGVjay13cml0ZQ06aW5kaXJlY3Qtd2FzaTppby9zdHJlYW1zQDAuMi4zLVttZXRob2Rdb3V0cHV0LXN0cmVhbS53cml0ZQ5DaW5kaXJlY3Qtd2FzaTppby9zdHJlYW1zQDAuMi4zLVttZXRob2Rdb3V0cHV0LXN0cmVhbS5ibG9ja2luZy1mbHVzaA9NaW5kaXJlY3Qtd2FzaTppby9zdHJlYW1zQDAuMi4zLVttZXRob2Rdb3V0cHV0LXN0cmVhbS5ibG9ja2luZy13cml0ZS1hbmQtZmx1c2gQN2luZGlyZWN0LXdhc2k6ZmlsZXN5c3RlbS9wcmVvcGVuc0AwLjIuMi1nZXQtZGlyZWN0b3JpZXM');
-    const module3 = base64Compile('AGFzbQEAAAABNglgBX9/f39/AGACf38AYAR/f39/AX9gAn9/AX9gAX8AYAF/AGACf38AYAN/fn8AYAR/f39/AAJsEgABMAAAAAExAAEAATIAAgABMwADAAE0AAMAATUABAABNgAFAAE3AAYAATgABwABOQAGAAIxMAAGAAIxMQAGAAIxMgAGAAIxMwAIAAIxNAAGAAIxNQAIAAIxNgAFAAgkaW1wb3J0cwFwARERCRcBAEEACxEAAQIDBAUGBwgJCgsMDQ4PEAAvCXByb2R1Y2VycwEMcHJvY2Vzc2VkLWJ5AQ13aXQtY29tcG9uZW50BzAuMjI3LjEAHARuYW1lABUUd2l0LWNvbXBvbmVudDpmaXh1cHM');
+    const module2 = base64Compile('AGFzbQEAAAABPQpgBX9/f39/AGACf38AYAR/f39/AGAEf39/fwF/YAJ/fwF/YAF/AGABfwBgAn9/AGADf35/AGAEf39/fwADExIAAQIDBAQFBgcIBwcHBwkHCQYEBQFwARISB1wTATAAAAExAAEBMgACATMAAwE0AAQBNQAFATYABgE3AAcBOAAIATkACQIxMAAKAjExAAsCMTIADAIxMwANAjE0AA4CMTUADwIxNgAQAjE3ABEIJGltcG9ydHMBAArrARIRACAAIAEgAiADIARBABEAAAsLACAAIAFBAREBAAsPACAAIAEgAiADQQIRAgALDwAgACABIAIgA0EDEQMACwsAIAAgAUEEEQQACwsAIAAgAUEFEQQACwkAIABBBhEFAAsJACAAQQcRBgALCwAgACABQQgRBwALDQAgACABIAJBCREIAAsLACAAIAFBChEHAAsLACAAIAFBCxEHAAsLACAAIAFBDBEHAAsLACAAIAFBDREHAAsPACAAIAEgAiADQQ4RCQALCwAgACABQQ8RBwALDwAgACABIAIgA0EQEQkACwkAIABBEREGAAsALwlwcm9kdWNlcnMBDHByb2Nlc3NlZC1ieQENd2l0LWNvbXBvbmVudAcwLjIyNy4xAIsIBG5hbWUAExJ3aXQtY29tcG9uZW50OnNoaW0B7gcSACdpbmRpcmVjdC1hcHA6Y2Fwcy9rdi1zdG9yZUAwLjEuMC1pbnNlcnQBImluZGlyZWN0LWFwcDpjYXBzL3RvYXN0QDAuMS4wLXNob3cCJGluZGlyZWN0LWFwcDpjYXBzL3VpLXN0YXRlQDAuMS4wLXNldAMlYWRhcHQtd2FzaV9zbmFwc2hvdF9wcmV2aWV3MS1mZF93cml0ZQQoYWRhcHQtd2FzaV9zbmFwc2hvdF9wcmV2aWV3MS1lbnZpcm9uX2dldAUuYWRhcHQtd2FzaV9zbmFwc2hvdF9wcmV2aWV3MS1lbnZpcm9uX3NpemVzX2dldAYmYWRhcHQtd2FzaV9zbmFwc2hvdF9wcmV2aWV3MS1wcm9jX2V4aXQHM2luZGlyZWN0LXdhc2k6Y2xpL2Vudmlyb25tZW50QDAuMi4zLWdldC1lbnZpcm9ubWVudAg6aW5kaXJlY3Qtd2FzaTpmaWxlc3lzdGVtL3R5cGVzQDAuMi4zLWZpbGVzeXN0ZW0tZXJyb3ItY29kZQlIaW5kaXJlY3Qtd2FzaTpmaWxlc3lzdGVtL3R5cGVzQDAuMi4zLVttZXRob2RdZGVzY3JpcHRvci53cml0ZS12aWEtc3RyZWFtCklpbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vdHlwZXNAMC4yLjMtW21ldGhvZF1kZXNjcmlwdG9yLmFwcGVuZC12aWEtc3RyZWFtC0BpbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vdHlwZXNAMC4yLjMtW21ldGhvZF1kZXNjcmlwdG9yLmdldC10eXBlDDxpbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vdHlwZXNAMC4yLjMtW21ldGhvZF1kZXNjcmlwdG9yLnN0YXQNQGluZGlyZWN0LXdhc2k6aW8vc3RyZWFtc0AwLjIuMy1bbWV0aG9kXW91dHB1dC1zdHJlYW0uY2hlY2std3JpdGUOOmluZGlyZWN0LXdhc2k6aW8vc3RyZWFtc0AwLjIuMy1bbWV0aG9kXW91dHB1dC1zdHJlYW0ud3JpdGUPQ2luZGlyZWN0LXdhc2k6aW8vc3RyZWFtc0AwLjIuMy1bbWV0aG9kXW91dHB1dC1zdHJlYW0uYmxvY2tpbmctZmx1c2gQTWluZGlyZWN0LXdhc2k6aW8vc3RyZWFtc0AwLjIuMy1bbWV0aG9kXW91dHB1dC1zdHJlYW0uYmxvY2tpbmctd3JpdGUtYW5kLWZsdXNoETdpbmRpcmVjdC13YXNpOmZpbGVzeXN0ZW0vcHJlb3BlbnNAMC4yLjItZ2V0LWRpcmVjdG9yaWVz');
+    const module3 = base64Compile('AGFzbQEAAAABPQpgBX9/f39/AGACf38AYAR/f39/AGAEf39/fwF/YAJ/fwF/YAF/AGABfwBgAn9/AGADf35/AGAEf39/fwACchMAATAAAAABMQABAAEyAAIAATMAAwABNAAEAAE1AAQAATYABQABNwAGAAE4AAcAATkACAACMTAABwACMTEABwACMTIABwACMTMABwACMTQACQACMTUABwACMTYACQACMTcABgAIJGltcG9ydHMBcAESEgkYAQBBAAsSAAECAwQFBgcICQoLDA0ODxARAC8JcHJvZHVjZXJzAQxwcm9jZXNzZWQtYnkBDXdpdC1jb21wb25lbnQHMC4yMjcuMQAcBG5hbWUAFRR3aXQtY29tcG9uZW50OmZpeHVwcw');
     ({ exports: exports0 } = yield instantiateCore(yield module2));
     ({ exports: exports1 } = yield instantiateCore(yield module0, {
       'app:caps/kv-store@0.1.0': {
@@ -8013,11 +8140,14 @@ const $init = (() => {
       'app:caps/toast@0.1.0': {
         show: exports0['1'],
       },
+      'app:caps/ui-state@0.1.0': {
+        set: exports0['2'],
+      },
       wasi_snapshot_preview1: {
-        environ_get: exports0['3'],
-        environ_sizes_get: exports0['4'],
-        fd_write: exports0['2'],
-        proc_exit: exports0['5'],
+        environ_get: exports0['4'],
+        environ_sizes_get: exports0['5'],
+        fd_write: exports0['3'],
+        proc_exit: exports0['6'],
       },
     }));
     ({ exports: exports2 } = yield instantiateCore(yield module1, {
@@ -8028,7 +8158,7 @@ const $init = (() => {
         memory: exports1.memory,
       },
       'wasi:cli/environment@0.2.3': {
-        'get-environment': exports0['6'],
+        'get-environment': exports0['7'],
       },
       'wasi:cli/exit@0.2.3': {
         exit: trampoline7,
@@ -8043,24 +8173,24 @@ const $init = (() => {
         'get-stdout': trampoline6,
       },
       'wasi:filesystem/preopens@0.2.2': {
-        'get-directories': exports0['16'],
+        'get-directories': exports0['17'],
       },
       'wasi:filesystem/types@0.2.3': {
-        '[method]descriptor.append-via-stream': exports0['9'],
-        '[method]descriptor.get-type': exports0['10'],
-        '[method]descriptor.stat': exports0['11'],
-        '[method]descriptor.write-via-stream': exports0['8'],
+        '[method]descriptor.append-via-stream': exports0['10'],
+        '[method]descriptor.get-type': exports0['11'],
+        '[method]descriptor.stat': exports0['12'],
+        '[method]descriptor.write-via-stream': exports0['9'],
         '[resource-drop]descriptor': trampoline0,
-        'filesystem-error-code': exports0['7'],
+        'filesystem-error-code': exports0['8'],
       },
       'wasi:io/error@0.2.3': {
         '[resource-drop]error': trampoline2,
       },
       'wasi:io/streams@0.2.3': {
-        '[method]output-stream.blocking-flush': exports0['14'],
-        '[method]output-stream.blocking-write-and-flush': exports0['15'],
-        '[method]output-stream.check-write': exports0['12'],
-        '[method]output-stream.write': exports0['13'],
+        '[method]output-stream.blocking-flush': exports0['15'],
+        '[method]output-stream.blocking-write-and-flush': exports0['16'],
+        '[method]output-stream.check-write': exports0['13'],
+        '[method]output-stream.write': exports0['14'],
         '[resource-drop]input-stream': trampoline3,
         '[resource-drop]output-stream': trampoline1,
       },
@@ -8094,11 +8224,12 @@ const $init = (() => {
         '14': trampoline18,
         '15': trampoline19,
         '16': trampoline20,
-        '2': exports2.fd_write,
-        '3': exports2.environ_get,
-        '4': exports2.environ_sizes_get,
-        '5': exports2.proc_exit,
-        '6': trampoline10,
+        '17': trampoline21,
+        '2': trampoline10,
+        '3': exports2.fd_write,
+        '4': exports2.environ_get,
+        '5': exports2.environ_sizes_get,
+        '6': exports2.proc_exit,
         '7': trampoline11,
         '8': trampoline12,
         '9': trampoline13,

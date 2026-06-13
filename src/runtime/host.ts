@@ -21,6 +21,7 @@ export interface CapImports {
   toast: { show: (message: string) => void };
   clock: { nowMs: () => bigint };
   nav: { go: (route: string) => void };
+  uiState: { set: (path: string, value: string) => void };
 }
 
 export interface HostJournal {
@@ -75,6 +76,13 @@ export function createHostJournal(ctx: HostCtx): HostJournal {
     },
     nav: {
       go: (route) => traces.push({ cap: "nav", route }),
+    },
+    // State writes are output, not an effect: a delta, no trace — matching
+    // the interpreter's SetState, which emits a delta and no capability trace.
+    uiState: {
+      set: (path, json) => {
+        delta.push({ t: "set", path, value: JSON.parse(json) as Value });
+      },
     },
   };
 

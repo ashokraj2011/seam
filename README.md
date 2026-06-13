@@ -4,36 +4,50 @@ Implementation of the contract-first application fabric studio.
 Specs: `~/Documents/artcle/BUILD_SPEC.md` (architecture) and
 `~/Documents/artcle/MVP1_PLAN_AND_SPEC.md` (MVP1 plan).
 
-**Current phase: M2 spike — the WASM substrate works.** MVP1 (P1–P6) is
-complete, and the M2 exit criterion holds: `save-customer`, hand-written in
-Rust and compiled with cargo-component, runs in the jco browser host and is
-behaviorally identical to its action-IR twin on the drift corpus. Swapping
-`BodyRef` between IR and component in the contract editor changes nothing
-the user can observe — which is the product thesis.
+**Current phase: M2 complete — the WASM substrate, with IR lowered to Rust.**
+MVP1 (P1–P6) is done, and M2's exit criterion holds in its strong form: the
+`save-customer` Rust component is **generated from the action-IR body**
+(`src/runtime/lower.ts`), compiled with cargo-component, run in the jco
+browser host, and is behaviorally identical to the interpreter on the drift
+corpus — same result, traces, and full post-state. Because the Rust is
+lowered from the same IR the interpreter runs, equivalence is by
+construction. Swapping `BodyRef` between IR and component in the contract
+editor changes nothing the user can observe — the product thesis.
 
-## What the M2 spike contains
+## What M2 contains
 
 - `components/save-customer/` — the `app:caps` WIT package (kv-store, toast,
-  clock, nav) and the hand-written Rust body. Its imports are exactly the
-  contract's grants; nothing else exists at runtime.
-- `scripts/build-component.mjs` (`npm run build:component`) — the build
-  worker: cargo-component → jco transpile → hashed manifest. Runs out of
-  band; the studio never compiles during design. No thick desktop IDE
-  needed: the toolchain is a sidecar of the local dev process.
-- `src/runtime/host.ts` + `caps/` — the host import table: journaled kv and
-  toast with the same atomic semantics as the interpreter.
+  clock, nav, ui-state) and the `lib.rs`/`world.wit` **generated from the
+  IR**. The component's imports are exactly the contract's grants (plus the
+  base ui-state channel); nothing else exists at runtime.
+- `src/runtime/lower.ts` — IR → Rust lowering (the §6 "one implementation"
+  mechanism). Covers the save-customer action set: Validate(nonEmpty),
+  KvInsert, Toast, SetState(lit). KvUpdate/KvDelete, KvQuery/Branch, and
+  var-sourced SetState throw `LoweringError` — the next lowering increment.
+- `scripts/lower-and-build.mjs` (`npm run build:component`) — the build
+  worker: lower IR → cargo-component → jco transpile → hashed manifest. Runs
+  out of band via `node --experimental-strip-types`; the studio never
+  compiles during design. **No thick desktop IDE needed** — the toolchain is
+  a sidecar of the local dev process.
+- `src/runtime/host.ts` + `caps/` — the host import table: journaled kv,
+  toast, and ui-state with the interpreter's exact atomic semantics. State
+  writes are output (a delta, no trace); kv/toast/nav are granted effects.
 - `src/runtime/component-host.ts` + `registry.ts` — invoke-by-hash (registry
   v0; M3 adds receipts and content-addressed storage).
 - The dispatcher's third arm is live: `BodyRef::component` instantiates and
   calls through the same `applyOutcome` seam as the interpreter.
-- `tests/drift.test.ts` — the M2 exit test: identical results, capability
-  traces, and post-state across both arms on the drift payloads. Runs on the
-  committed transpiled artifact, so CI needs no Rust toolchain.
+- `tests/drift.test.ts` — the M2 exit test: identical result, traces, and
+  full post-state (store rows AND cleared draft state) across both arms,
+  plus a lowering snapshot. Runs on the committed transpiled artifact, so CI
+  needs no Rust toolchain.
 
-**Recorded M2 finding:** `SetState` has no capability analog — UI-state
-writes are interpreter-side only, so the Rust twin can't clear the form
-inputs. Lowering IR→Rust needs either a `ui-state` capability or wire-level
-state mapping. Decide before M5 export.
+**M2 finding, resolved:** `SetState` now lowers via the `ui-state` base
+capability, so the compiled body clears the form inputs exactly as the
+interpreter does — verified live and in the drift corpus.
+
+**M2 boundary, documented:** the lowering covers save-customer's actions;
+KvUpdate/KvDelete (delete-customer needs a kv filter mini-language) and
+var-sourced state writes are the next increment before M5 export.
 
 ## Run
 

@@ -23,3 +23,11 @@ interface clock {
 interface nav {
   go: func(route: string);
 }
+
+// A body's own page-state output channel (SetState lowers to this). Unlike
+// kv/toast/nav it is a base capability every host supplies, not a grantable
+// external effect: writing your page's state is output, not reaching outward.
+// `value` is JSON-encoded so the host reconstructs the exact Value.
+interface ui-state {
+  set: func(path: string, value: string);
+}

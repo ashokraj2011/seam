@@ -1,6 +1,7 @@
 // world root:component/root
 export type * as AppCapsKvStore010 from './interfaces/app-caps-kv-store.js'; // import app:caps/kv-store@0.1.0
 export type * as AppCapsToast010 from './interfaces/app-caps-toast.js'; // import app:caps/toast@0.1.0
+export type * as AppCapsUiState010 from './interfaces/app-caps-ui-state.js'; // import app:caps/ui-state@0.1.0
 export type * as WasiCliEnvironment023 from './interfaces/wasi-cli-environment.js'; // import wasi:cli/environment@0.2.3
 export type * as WasiCliExit023 from './interfaces/wasi-cli-exit.js'; // import wasi:cli/exit@0.2.3
 export type * as WasiCliStderr023 from './interfaces/wasi-cli-stderr.js'; // import wasi:cli/stderr@0.2.3

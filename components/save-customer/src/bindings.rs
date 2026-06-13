@@ -266,6 +266,43 @@ pub mod app {
                 }
             }
         }
+        /// A body's own page-state output channel (SetState lowers to this). Unlike
+        /// kv/toast/nav it is a base capability every host supplies, not a grantable
+        /// external effect: writing your page's state is output, not reaching outward.
+        /// `value` is JSON-encoded so the host reconstructs the exact Value.
+        #[allow(dead_code, async_fn_in_trait, unused_imports, clippy::all)]
+        pub mod ui_state {
+            #[used]
+            #[doc(hidden)]
+            static __FORCE_SECTION_REF: fn() = super::super::super::__link_custom_section_describing_imports;
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn set(path: &str, value: &str) -> () {
+                unsafe {
+                    let vec0 = path;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let vec1 = value;
+                    let ptr1 = vec1.as_ptr().cast::<u8>();
+                    let len1 = vec1.len();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "app:caps/ui-state@0.1.0")]
+                    unsafe extern "C" {
+                        #[link_name = "set"]
+                        fn wit_import2(_: *mut u8, _: usize, _: *mut u8, _: usize);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    unsafe extern "C" fn wit_import2(
+                        _: *mut u8,
+                        _: usize,
+                        _: *mut u8,
+                        _: usize,
+                    ) {
+                        unreachable!()
+                    }
+                    unsafe { wit_import2(ptr0.cast_mut(), len0, ptr1.cast_mut(), len1) };
+                }
+            }
+        }
     }
 }
 #[rustfmt::skip]
@@ -453,17 +490,19 @@ pub(crate) use __export_save_customer_body_impl as export;
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 459] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xc2\x02\x01A\x02\x01\
-A\x06\x01B\x09\x01o\x02ss\x01p\0\x01j\0\x01s\x01@\x02\x05stores\x06fields\x01\0\x02\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 516] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xfb\x02\x01A\x02\x01\
+A\x08\x01B\x09\x01o\x02ss\x01p\0\x01j\0\x01s\x01@\x02\x05stores\x06fields\x01\0\x02\
 \x04\0\x06insert\x01\x03\x01ps\x01j\x01\x04\x01s\x01@\x02\x05stores\x06filters\0\
 \x05\x04\0\x05query\x01\x06\x03\0\x17app:caps/kv-store@0.1.0\x05\0\x01B\x02\x01@\
 \x01\x07messages\x01\0\x04\0\x04show\x01\0\x03\0\x14app:caps/toast@0.1.0\x05\x01\
-\x01B\x05\x01r\x02\x04names\x05emails\x04\0\x13save-customer-input\x03\0\0\x01j\0\
-\x01s\x01@\x01\x05input\x01\0\x02\x04\0\x06invoke\x01\x03\x04\0\x20app:customer/\
-save-customer@0.1.0\x05\x02\x04\0%app:customer/save-customer-body@0.1.0\x04\0\x0b\
-\x18\x01\0\x12save-customer-body\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\
-\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
+\x01B\x02\x01@\x02\x04paths\x05values\x01\0\x04\0\x03set\x01\0\x03\0\x17app:caps\
+/ui-state@0.1.0\x05\x02\x01B\x05\x01r\x02\x04names\x05emails\x04\0\x13save-custo\
+mer-input\x03\0\0\x01j\0\x01s\x01@\x01\x05input\x01\0\x02\x04\0\x06invoke\x01\x03\
+\x04\0\x20app:customer/save-customer@0.1.0\x05\x03\x04\0%app:customer/save-custo\
+mer-body@0.1.0\x04\0\x0b\x18\x01\0\x12save-customer-body\x03\0\0\0G\x09producers\
+\x01\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41\
+.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

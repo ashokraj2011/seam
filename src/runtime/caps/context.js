@@ -12,6 +12,7 @@ export const current = {
   toast: { show: unbound },
   clock: { nowMs: unbound },
   nav: { go: unbound },
+  uiState: { set: unbound },
 };
 
 export function bindImports(imports) {
@@ -19,4 +20,5 @@ export function bindImports(imports) {
   current.toast = imports.toast;
   current.clock = imports.clock;
   current.nav = imports.nav;
+  current.uiState = imports.uiState;
 }
