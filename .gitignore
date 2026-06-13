@@ -6,3 +6,5 @@ test-results/
 playwright-report/
 .claude/
 components/save-customer/target/
+public/seam-runtime.js
+public/standalone-demo.html

@@ -10,6 +10,8 @@ import { Inspector } from "./Inspector";
 import { Palette } from "./Palette";
 import { PagesPanel, StatePanel, StoresPanel } from "./panels";
 import { wipeKvTables } from "../runtime/kvpersist";
+import { buildStandaloneHtml } from "../export/standalone";
+import appCss from "../kit/app.css?inline";
 import {
   apply,
   kernel,
@@ -94,13 +96,37 @@ export function App() {
   onMount(() => window.addEventListener("keydown", onKey));
   onCleanup(() => window.removeEventListener("keydown", onKey));
 
-  const exportGraph = () => {
-    const blob = new Blob([kernel.snapshotJson()], { type: "application/json" });
+  const download = (content: string, filename: string, type: string) => {
+    const blob = new Blob([content], { type });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "graph.json";
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(a.href);
+  };
+
+  const exportGraph = () => download(kernel.snapshotJson(), "graph.json", "application/json");
+
+  // Emit the current app as ONE self-contained HTML file — no studio, no
+  // server, data kept locally. The lock-in-free artifact you own.
+  const exportStandalone = async () => {
+    try {
+      const runtimeJs = await fetch("/seam-runtime.js").then((r) => {
+        if (!r.ok) throw new Error("runtime bundle missing — run: npm run build:runtime");
+        return r.text();
+      });
+      const name = kernel.state.project.name || "app";
+      const html = buildStandaloneHtml({
+        title: name,
+        graphJson: kernel.snapshotJson(),
+        runtimeJs,
+        css: appCss,
+      });
+      download(html, `${name}.html`, "text/html");
+      setStatus(`exported ${name}.html — open it anywhere, no studio or server needed`);
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : String(err));
+    }
   };
 
   const importGraphFile = async (file: File) => {
@@ -146,6 +172,9 @@ export function App() {
           ✨ Generate
         </button>
         <button onClick={exportGraph}>Export</button>
+        <button class="s-generate" onClick={() => void exportStandalone()} title="emit a single self-contained HTML file — runs with no studio or server">
+          ⬇ Standalone
+        </button>
         <button onClick={() => importInput.click()}>Import</button>
         <input
           ref={importInput}

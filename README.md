@@ -57,6 +57,26 @@ editor changes nothing the user can observe — the product thesis.
 contracts (e.g. `select-customer`) still throw `LoweringError` — the
 interpreter runs them; the compiled path is the next increment.
 
+## Standalone export — the app runs with the studio gone
+
+The **⬇ Standalone** button emits the current app as **one self-contained HTML
+file**: the kit CSS, a Solid-free runtime bundle (`src/runtime-app/run.ts` →
+`public/seam-runtime.js`, ~39 KB), and the graph, all inlined. Open the file
+and the app runs — no studio, no server, data kept locally in the browser.
+This is the lock-in-free claim made tangible: the artifact is portable and
+entirely yours.
+
+- `src/runtime-app/run.ts` — the standalone bootstrap: reuses the renderer,
+  dispatcher, and interpreter; browser host (kv → localStorage, toast → DOM);
+  no studio chrome.
+- `src/export/standalone.ts` — the packager (`buildStandaloneHtml`), pure and
+  unit-tested, with `</script>`-injection guards.
+- Built via `npm run build:runtime` (a Vite library build → IIFE exposing
+  `SeamRuntime.run`); `npm run dev` and `npm run build` produce it automatically.
+- Verified end to end (`tests/runtime-app.test.ts`): a generated app, run from
+  its graph JSON alone, renders, saves, and persists across a fresh run; and
+  live, a generated Tasks app served as a standalone file runs with no studio.
+
 ## Generate an app from a data shape (lock-in-free demo)
 
 The **✨ Generate** button (or `src/studio/generate.ts`) turns an entity + a
